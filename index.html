@@ -11,6 +11,9 @@
       --primary-light: #e9f1ff;
       --bg: #f4f6f9;
       --card-bg: #ffffff;
+      --status-good: #0a7a29;
+      --status-warn: #b8860b;
+      --status-bad: #b22222;
     }
 
     * {
@@ -160,6 +163,20 @@
       font-size: 0.75rem;
       color: #666;
       margin-top: 4px;
+    }
+
+    /* Status colours */
+    .status-good {
+      color: var(--status-good);
+      font-weight: bold;
+    }
+    .status-warn {
+      color: var(--status-warn);
+      font-weight: bold;
+    }
+    .status-bad {
+      color: var(--status-bad);
+      font-weight: bold;
     }
 
     footer {
@@ -350,15 +367,56 @@
         });
         thead.appendChild(headerRow);
 
+        // Find index of first "status" column (header contains 'status')
+        let statusIndex = -1;
+        rows[0].forEach((cell, idx) => {
+          const name = cell.toLowerCase();
+          if (name.includes("status") && statusIndex === -1) {
+            statusIndex = idx;
+          }
+        });
+
         // Data rows
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
           if (row.every(c => c.trim() === "")) continue; // skip empty rows
 
           const tr = document.createElement('tr');
-          row.forEach(cell => {
+
+          row.forEach((cell, idx) => {
             const td = document.createElement('td');
-            td.textContent = cell;
+            const text = cell.trim();
+            td.textContent = text;
+
+            // Apply traffic-light colour if this is the status column
+            if (statusIndex === idx && text !== "") {
+              const lower = text.toLowerCase();
+
+              if (
+                lower.includes("on track") ||
+                lower.includes("on-track") ||
+                lower.includes("on time") ||
+                lower.includes("on-time") ||
+                lower.includes("within budget")
+              ) {
+                td.classList.add("status-good");
+              } else if (
+                lower.includes("at risk") ||
+                lower.includes("risk") ||
+                lower.includes("delayed") ||
+                lower.includes("behind")
+              ) {
+                td.classList.add("status-warn");
+              } else if (
+                lower.includes("off track") ||
+                lower.includes("off-track") ||
+                lower.includes("critical") ||
+                lower.includes("severe")
+              ) {
+                td.classList.add("status-bad");
+              }
+            }
+
             tr.appendChild(td);
           });
           tbody.appendChild(tr);

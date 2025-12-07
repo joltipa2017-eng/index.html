@@ -187,6 +187,15 @@
     .legend span {
       margin-right: 12px;
     }
+
+    footer {
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.8rem;
+      margin-top: 30px;
+    }
   </style>
 </head>
 
@@ -213,7 +222,7 @@
 
     <div class="card" onclick="openSection('evaluation')">
       <h3>Evaluation</h3>
-      <p>Baseline, mid-term &amp; end-line evaluation notes.</p>
+      <p>Findings and ratings from evaluation CSV file.</p>
     </div>
 
     <div class="card" onclick="openSection('learning')">
@@ -262,7 +271,7 @@
     </div>
 
     <div class="legend">
-      <strong>Rating colour key (1–5):</strong>
+      <strong>Monitoring rating colour key (1–5):</strong>
       <span class="status-bad">1–2 = Off-track / Poor</span>
       <span class="status-warn">3 = Moderate / Watch</span>
       <span class="status-good">4–5 = On-track / Good</span>
@@ -276,11 +285,34 @@
   </div>
 
   <div id="evaluation" class="section">
-    <h2>Evaluation</h2>
+    <h2>Evaluation – CSV Feed</h2>
     <p>
-      This section can summarise evaluation findings (baseline, mid-term, end-line) once your evaluation
-      data tables and dashboards are integrated.
+      The table below is populated from the <code>evaluation_data.csv</code> file stored in this repository.
+      It provides an overview of evaluation phase, overall rating, key findings and recommendations.
     </p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead id="evaluation-head">
+          <!-- Evaluation CSV header row will be inserted here -->
+        </thead>
+        <tbody id="evaluation-body">
+          <!-- Evaluation CSV data rows will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <strong>Evaluation rating colour key (1–5):</strong>
+      <span class="status-bad">1–2 = Weak / Unsatisfactory</span>
+      <span class="status-warn">3 = Fair / Needs improvement</span>
+      <span class="status-good">4–5 = Good / Strong</span>
+    </div>
+
+    <div class="info-note">
+      On mobile, swipe left/right to view all columns.
+    </div>
+
     <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
   </div>
 
@@ -342,8 +374,13 @@
     }
   }
 
-  // ===== CSV LOADER FOR MONITORING TABLE (LOCAL CSV FILE) =====
+  // ===== CSV LOADERS =====
   document.addEventListener('DOMContentLoaded', function () {
+    loadMonitoringTable();
+    loadEvaluationTable();
+  });
+
+  function loadMonitoringTable() {
     const csvUrl = "monitoring_data.csv";
 
     fetch(csvUrl)
@@ -356,7 +393,7 @@
       .then(text => {
         const rows = parseCSV(text);
         if (!rows || rows.length === 0) {
-          throw new Error("CSV file is empty or could not be parsed.");
+          throw new Error("Monitoring CSV file is empty or could not be parsed.");
         }
 
         const thead = document.getElementById('monitoring-head');
@@ -425,7 +462,7 @@
         }
       })
       .catch(err => {
-        console.error("Error loading CSV:", err);
+        console.error("Error loading Monitoring CSV:", err);
         const tbody = document.getElementById('monitoring-body');
         if (tbody) {
           const tr = document.createElement('tr');
@@ -436,7 +473,92 @@
           tbody.appendChild(tr);
         }
       });
-  });
+  }
+
+  function loadEvaluationTable() {
+    const csvUrl = "evaluation_data.csv";
+
+    fetch(csvUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
+        }
+        return response.text();
+      })
+      .then(text => {
+        const rows = parseCSV(text);
+        if (!rows || rows.length === 0) {
+          throw new Error("Evaluation CSV file is empty or could not be parsed.");
+        }
+
+        const thead = document.getElementById('evaluation-head');
+        const tbody = document.getElementById('evaluation-body');
+
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        // First row = header
+        const headerRow = document.createElement('tr');
+        rows[0].forEach(cell => {
+          const th = document.createElement('th');
+          th.textContent = cell;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        // Find rating column (header contains 'rating')
+        const headerNames = rows[0].map(h => h.trim().toLowerCase());
+        let ratingIndex = -1;
+        headerNames.forEach((name, idx) => {
+          if (name.includes("rating") && ratingIndex === -1) {
+            ratingIndex = idx;
+          }
+        });
+
+        // Data rows
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.every(c => c.trim() === "")) continue; // skip empty rows
+
+          const tr = document.createElement('tr');
+
+          row.forEach((cell, idx) => {
+            const td = document.createElement('td');
+            const text = cell.trim();
+            td.textContent = text;
+
+            // Apply colours if this is the rating column
+            if (ratingIndex === idx && text !== "") {
+              const value = parseFloat(text);
+              if (!isNaN(value)) {
+                if (value >= 4) {
+                  td.classList.add("status-good");   // 4–5
+                } else if (value <= 2) {
+                  td.classList.add("status-bad");    // 1–2
+                } else if (value === 3) {
+                  td.classList.add("status-warn");   // 3
+                }
+              }
+            }
+
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading Evaluation CSV:", err);
+        const tbody = document.getElementById('evaluation-body');
+        if (tbody) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 4;
+          td.textContent = "Error loading evaluation data: " + err.message;
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+        }
+      });
+  }
 
   // Very simple CSV parser (works if no commas inside cells)
   function parseCSV(text) {

@@ -191,7 +191,7 @@
 
     <div class="card" onclick="openSection('monitoring')">
       <h3>Monitoring &amp; Control</h3>
-      <p>Live data from ProMEL monitoring CSV feed.</p>
+      <p>Live data from ProMEL monitoring CSV file.</p>
     </div>
 
     <div class="card" onclick="openSection('evaluation')">
@@ -229,7 +229,7 @@
   <div id="monitoring" class="section">
     <h2>Monitoring &amp; Control – CSV Feed</h2>
     <p>
-      The table below is populated from the ProMEL Monitoring CSV feed published from Google Sheets.
+      The table below is populated from the <code>monitoring_data.csv</code> file stored in this repository.
       It is designed to be mobile friendly and scrollable on small screens.
     </p>
 
@@ -317,27 +317,27 @@
     }
   }
 
-  // ===== CSV LOADER FOR MONITORING TABLE =====
+  // ===== CSV LOADER FOR MONITORING TABLE (LOCAL CSV FILE) =====
   document.addEventListener('DOMContentLoaded', function () {
-    // Your actual published CSV URL from Google Sheets
-    const csvUrl =
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?output=csv";
+    // Load CSV that lives in same repo: monitoring_data.csv
+    const csvUrl = "monitoring_data.csv";
 
     fetch(csvUrl)
       .then(response => {
         if (!response.ok) {
-          throw new Error("Network response was not ok: " + response.status);
+          throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
         }
         return response.text();
       })
       .then(text => {
         const rows = parseCSV(text);
-        if (!rows || rows.length === 0) return;
+        if (!rows || rows.length === 0) {
+          throw new Error("CSV file is empty or could not be parsed.");
+        }
 
         const thead = document.getElementById('monitoring-head');
         const tbody = document.getElementById('monitoring-body');
 
-        // Clear any existing content
         thead.innerHTML = "";
         tbody.innerHTML = "";
 
@@ -350,11 +350,10 @@
         });
         thead.appendChild(headerRow);
 
-        // Remaining rows = data
+        // Data rows
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          // skip empty rows
-          if (row.every(c => c.trim() === "")) continue;
+          if (row.every(c => c.trim() === "")) continue; // skip empty rows
 
           const tr = document.createElement('tr');
           row.forEach(cell => {

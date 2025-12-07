@@ -165,7 +165,7 @@
       margin-top: 4px;
     }
 
-    /* Status colours */
+    /* Status colours for numeric ratings */
     .status-good {
       color: var(--status-good);
       font-weight: bold;
@@ -179,13 +179,13 @@
       font-weight: bold;
     }
 
-    footer {
-      background: var(--primary);
-      color: #fff;
-      text-align: center;
-      padding: 10px;
-      font-size: 0.8rem;
-      margin-top: 30px;
+    .legend {
+      margin-top: 6px;
+      font-size: 0.75rem;
+    }
+
+    .legend span {
+      margin-right: 12px;
     }
   </style>
 </head>
@@ -260,8 +260,16 @@
         </tbody>
       </table>
     </div>
+
+    <div class="legend">
+      <strong>Rating colour key (1–5):</strong>
+      <span class="status-bad">1–2 = Off-track / Poor</span>
+      <span class="status-warn">3 = Moderate / Watch</span>
+      <span class="status-good">4–5 = On-track / Good</span>
+    </div>
+
     <div class="info-note">
-      If the table is wide, swipe left/right on mobile to view all columns.
+      On mobile, swipe left/right to view all columns.
     </div>
 
     <button class="close-btn" onclick="closeSection('monitoring')">Close</button>
@@ -336,7 +344,6 @@
 
   // ===== CSV LOADER FOR MONITORING TABLE (LOCAL CSV FILE) =====
   document.addEventListener('DOMContentLoaded', function () {
-    // Load CSV that lives in same repo: monitoring_data.csv
     const csvUrl = "monitoring_data.csv";
 
     fetch(csvUrl)
@@ -367,13 +374,23 @@
         });
         thead.appendChild(headerRow);
 
-        // Find index of first "status" column (header contains 'status')
-        let statusIndex = -1;
-        rows[0].forEach((cell, idx) => {
-          const name = cell.toLowerCase();
-          if (name.includes("status") && statusIndex === -1) {
-            statusIndex = idx;
-          }
+        // Identify rating columns by header name
+        const headerNames = rows[0].map(h => h.trim().toLowerCase());
+        const ratingHeaders = [
+          "activity implementation on schedule",
+          "budget utilization as planned",
+          "staff availability",
+          "community participation",
+          "coordination with partners"
+        ];
+        const ratingIndices = [];
+
+        headerNames.forEach((name, idx) => {
+          ratingHeaders.forEach(target => {
+            if (name === target) {
+              ratingIndices.push(idx);
+            }
+          });
         });
 
         // Data rows
@@ -388,32 +405,17 @@
             const text = cell.trim();
             td.textContent = text;
 
-            // Apply traffic-light colour if this is the status column
-            if (statusIndex === idx && text !== "") {
-              const lower = text.toLowerCase();
-
-              if (
-                lower.includes("on track") ||
-                lower.includes("on-track") ||
-                lower.includes("on time") ||
-                lower.includes("on-time") ||
-                lower.includes("within budget")
-              ) {
-                td.classList.add("status-good");
-              } else if (
-                lower.includes("at risk") ||
-                lower.includes("risk") ||
-                lower.includes("delayed") ||
-                lower.includes("behind")
-              ) {
-                td.classList.add("status-warn");
-              } else if (
-                lower.includes("off track") ||
-                lower.includes("off-track") ||
-                lower.includes("critical") ||
-                lower.includes("severe")
-              ) {
-                td.classList.add("status-bad");
+            // Apply colours if this column is one of the rating indices
+            if (ratingIndices.includes(idx) && text !== "") {
+              const value = parseFloat(text);
+              if (!isNaN(value)) {
+                if (value >= 4) {
+                  td.classList.add("status-good");   // 4–5
+                } else if (value <= 2) {
+                  td.classList.add("status-bad");    // 1–2
+                } else if (value === 3) {
+                  td.classList.add("status-warn");   // 3
+                }
               }
             }
 

@@ -1,148 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ProMEL Analytics Solutions | PMCEL Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>ProMEL Analytics Solutions | PMCEL Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f4f6f9;
-        }
+  <style>
+    :root {
+      --primary: #003366;
+      --primary-light: #e9f1ff;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+    }
 
-        header {
-            background: #003366;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .container {
-            padding: 20px;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #333;
+    }
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-        }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+    }
 
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
 
-        .card:hover {
-            transform: scale(1.03);
-        }
+    header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
 
-        .card h3 {
-            color: #003366;
-            margin-bottom: 10px;
-        }
+    .container {
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-        footer {
-            margin-top: 40px;
-            background: #003366;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-        }
-    </style>
+    /* Card grid */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+      font-size: 0.9rem;
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      background: var(--primary-light);
+    }
+
+    /* Sections */
+    .section {
+      display: none;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .section p {
+      margin: 4px 0 10px;
+      font-size: 0.85rem;
+    }
+
+    .close-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    .close-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Responsive table wrapper */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      min-width: 480px; /* allows horizontal scroll on very small screens */
+    }
+
+    th, td {
+      border-bottom: 1px solid #eee;
+      padding: 6px 8px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #eef3fb;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    .info-note {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    footer {
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.8rem;
+      margin-top: 30px;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-    <h1>ProMEL Analytics Solutions</h1>
-    <p>Project Monitoring & Control, Evaluation & Learning (PMCEL) Dashboard</p>
+  <h1>ProMEL Analytics Solutions</h1>
+  <p>Project Monitoring &amp; Control, Evaluation &amp; Learning (PMCEL) Dashboard</p>
 </header>
 
 <div class="container">
 
-    <div class="cards">
-        <div class="card">
-            <h3>Overview</h3>
-            <p>High-level project performance summary.</p>
-        </div>
-
-        <div class="card">
-            <h3>Monitoring & Control</h3>
-            <p>Track project schedule, cost, scope & quality.</p>
-        </div>
-<section id="monitoring-input" class="card">
-  <h2>Monitoring Input – Online Form</h2>
-  <p>
-    Use this form to submit project monitoring data directly into the ProMEL system.
-  </p>
-<section id="evaluation-input" class="card">
-  <h2>Evaluation Input – Online Form</h2>
-  <p>
-    Use this form to capture project outcomes, impact, sustainability and lessons learned.
-    All responses will be stored in the ProMEL Evaluation Google Sheet for analysis and reporting.
-  </p>
-
-  <iframe
-      src=https://docs.google.com/spreadsheets/d/FILE_ID/export?format=csv
-
-      width="100%"
-      height="900"
-      frameborder="0"
-      marginheight="0"
-      marginwidth="0">
-  </iframe>
-</section>
-
-  <iframe
-      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?output=csv "
-      width="100%"
-      height="800"
-      frameborder="0"
-      marginheight="0"
-      marginwidth="0">
-  </iframe>
-</section>
-
-        <div class="card">
-            <h3>Evaluation</h3>
-            <p>Baseline, Mid-term & End-line Evaluation.</p>
-        </div>
-
-        <div class="card">
-            <h3>Learning</h3>
-            <p>Lessons Learned & Knowledge Repository.</p>
-        </div>
-
-        <div class="card">
-            <h3>Reports</h3>
-            <p>Automated Monitoring and Evaluation Reports.</p>
-        </div>
-
-        <div class="card">
-            <h3>Power BI Dashboard</h3>
-            <p>Integrated Business Intelligence View.</p>
-        </div>
+  <!-- Navigation cards -->
+  <div class="cards">
+    <div class="card" onclick="openSection('overview')">
+      <h3>Overview</h3>
+      <p>High-level project performance summary.</p>
     </div>
+
+    <div class="card" onclick="openSection('monitoring')">
+      <h3>Monitoring &amp; Control</h3>
+      <p>Live data from ProMEL monitoring CSV feed.</p>
+    </div>
+
+    <div class="card" onclick="openSection('evaluation')">
+      <h3>Evaluation</h3>
+      <p>Baseline, mid-term &amp; end-line evaluation notes.</p>
+    </div>
+
+    <div class="card" onclick="openSection('learning')">
+      <h3>Learning</h3>
+      <p>Lessons learned &amp; adaptive management.</p>
+    </div>
+
+    <div class="card" onclick="openSection('reports')">
+      <h3>Reports</h3>
+      <p>Monitoring and evaluation reporting hub.</p>
+    </div>
+
+    <div class="card" onclick="openSection('powerbi')">
+      <h3>Power BI Dashboard</h3>
+      <p>Integrated business intelligence view.</p>
+    </div>
+  </div>
+
+  <!-- Sections -->
+
+  <div id="overview" class="section">
+    <h2>Project Overview</h2>
+    <p>
+      This section provides a summary view of projects and key PMCEL indicators.
+      It can be expanded later to show aggregated statistics from your data source.
+    </p>
+    <button class="close-btn" onclick="closeSection('overview')">Close</button>
+  </div>
+
+  <div id="monitoring" class="section">
+    <h2>Monitoring &amp; Control – CSV Feed</h2>
+    <p>
+      The table below is populated from the ProMEL Monitoring CSV feed published from Google Sheets.
+      It is designed to be mobile friendly and scrollable on small screens.
+    </p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead id="monitoring-head">
+          <!-- CSV header row will be inserted here -->
+        </thead>
+        <tbody id="monitoring-body">
+          <!-- CSV data rows will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+    <div class="info-note">
+      If the table is wide, swipe left/right on mobile to view all columns.
+    </div>
+
+    <button class="close-btn" onclick="closeSection('monitoring')">Close</button>
+  </div>
+
+  <div id="evaluation" class="section">
+    <h2>Evaluation</h2>
+    <p>
+      This section can summarise evaluation findings (baseline, mid-term, end-line) once your evaluation
+      data tables and dashboards are integrated.
+    </p>
+    <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
+  </div>
+
+  <div id="learning" class="section">
+    <h2>Learning &amp; Knowledge</h2>
+    <p>
+      Use this space to highlight lessons learned, good practices and management
+      recommendations from your PMCEL system.
+    </p>
+    <button class="close-btn" onclick="closeSection('learning')">Close</button>
+  </div>
+
+  <div id="reports" class="section">
+    <h2>Reports</h2>
+    <p>
+      This section can link to automated monitoring and evaluation reports generated from
+      your data and business intelligence tools.
+    </p>
+    <button class="close-btn" onclick="closeSection('reports')">Close</button>
+  </div>
+
+  <div id="powerbi" class="section">
+    <h2>Power BI Dashboard</h2>
+    <p>
+      When your Power BI report is ready and published, you can embed it here using an
+      &lt;iframe&gt; from Power BI.
+    </p>
+
+    <!-- Example placeholder only -->
+    <div class="table-wrapper" style="text-align:center; padding:16px; border-style:dashed;">
+      Power BI embed placeholder.<br>
+      Replace this box with the Power BI &lt;iframe&gt; when available.
+    </div>
+
+    <button class="close-btn" onclick="closeSection('powerbi')">Close</button>
+  </div>
 
 </div>
 
 <footer>
-    &copy; 2025 ProMEL Analytics Solutions | Digital PMCEL System
+  &copy; 2025 ProMEL Analytics Solutions | Digital PMCEL System
 </footer>
+
+<script>
+  // Show/Hide sections
+  function openSection(id) {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function closeSection(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = 'none';
+    }
+  }
+
+  // ===== CSV LOADER FOR MONITORING TABLE =====
+  document.addEventListener('DOMContentLoaded', function () {
+    // 👉 Replace this with your actual published CSV URL from Google Sheets
+    const csvUrl =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?output=csv";
+
+    fetch(csvUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok: " + response.status);
+        }
+        return response.text();
+      })
+      .then(text => {
+        const rows = parseCSV(text);
+        if (!rows || rows.length === 0) return;
+
+        const thead = document.getElementById('monitoring-head');
+        const tbody = document.getElementById('monitoring-body');
+
+        // Clear any existing content
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        // First row = header
+        const headerRow = document.createElement('tr');
+        rows[0].forEach(cell => {
+          const th = document.createElement('th');
+          th.textContent = cell;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        // Remaining rows = data
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          // skip empty rows
+          if (row.every(c => c.trim() === "")) continue;
+
+          const tr = document.createElement('tr');
+          row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading CSV:", err);
+        const tbody = document.getElementById('monitoring-body');
+        if (tbody) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 4;
+          td.textContent = "Unable to load monitoring data.";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+        }
+      });
+  });
+
+  // Very simple CSV parser (works if no commas inside cells)
+  function parseCSV(text) {
+    const lines = text.trim().split("\n");
+    return lines.map(line => line.split(","));
+  }
+</script>
 
 </body>
 </html>
-
-
-
-
-
-

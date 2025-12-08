@@ -782,6 +782,46 @@
   let avgRatingsChart = null;
   let beneficiariesChart = null;
 
+  // ============================
+  // EXPECTED CSV HEADERS (LOWERCASE)
+  // ============================
+
+  // MONITORING CSV (monitoring_data.csv)
+  // First row should conceptually map to these names once lowercased:
+  //
+  // timestamp
+  // project name
+  // project code
+  // implementing agency / organization
+  // province / district / location
+  // reporting period
+  // reporting date
+  // activity implementation on schedule
+  // budget utilization as planned
+  // staff availability
+  // community participation
+  // coordination with partners
+  // number of beneficiaries reached this period.
+  // main achievements this period.
+  // key challenges / risks
+  // immediate actions required / recommendations
+  //
+  // EVALUATION CSV (evaluation_data.csv)
+  // First row should conceptually map to these names once lowercased:
+  //
+  // timestamp
+  // project name
+  // project code
+  // implementing agency / organization
+  // province / district / location
+  // reporting period
+  // evaluation phase
+  // outcome rating
+  // impact rating
+  // overall rating
+  // key findings
+  // recommendations
+
   // LOGIN & INIT
   document.addEventListener('DOMContentLoaded', function () {
     const loginScreen = document.getElementById('login-screen');
@@ -966,7 +1006,7 @@
     const currentLoc = locSel.value;
 
     const projects = new Set();
-    const periods = new Set();
+    the periods = new Set();
     const locations = new Set();
 
     const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
@@ -1109,7 +1149,7 @@
     });
     thead.appendChild(headerRow);
 
-    // Identify rating columns by header name
+    // Identify rating columns by header name (lowercase)
     const headerNames = rows[0].map(h => h.trim().toLowerCase());
     const ratingHeaders = [
       "activity implementation on schedule",
@@ -1322,11 +1362,11 @@
     const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxProject      = headersLower.indexOf('project name');
-    const idxPeriod       = headersLower.indexOf('reporting period');
-    const idxAchieve      = headersLower.indexOf('main achievements his period.');
-    const idxChallenges   = headersLower.indexOf('key challenges / risks');
-    const idxActions      = headersLower.indexOf('immediate actions required / recommendations');
+    const idxProject    = headersLower.indexOf('project name');
+    const idxPeriod     = headersLower.indexOf('reporting period');
+    const idxAchieve    = headersLower.indexOf('main achievements this period.');
+    const idxChallenges = headersLower.indexOf('key challenges / risks');
+    const idxActions    = headersLower.indexOf('immediate actions required / recommendations');
 
     const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
     const recent = dataRows.slice(-6).reverse();
@@ -1389,11 +1429,11 @@
     const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxAct   = headersLower.indexOf('activity implementation on schedule');
-    const idxBud   = headersLower.indexOf('budget utilization as planned');
-    const idxStaff = headersLower.indexOf('staff availability');
-    const idxComm  = headersLower.indexOf('community participation');
-    const idxCoord = headersLower.indexOf('coordination with partners');
+    const idxAct    = headersLower.indexOf('activity implementation on schedule');
+    const idxBud    = headersLower.indexOf('budget utilization as planned');
+    const idxStaff  = headersLower.indexOf('staff availability');
+    const idxComm   = headersLower.indexOf('community participation');
+    const idxCoord  = headersLower.indexOf('coordination with partners');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxBenef  = headersLower.indexOf('number of beneficiaries reached this period.');
 

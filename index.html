@@ -465,12 +465,12 @@
 
       <div class="card" onclick="openSection('monitoring')">
         <h3>Monitoring &amp; Control</h3>
-        <p>Live data from ProMEL monitoring CSV file.</p>
+        <p>Live data from ProMEL Monitoring Google Sheet (CSV feed).</p>
       </div>
 
       <div class="card" onclick="openSection('evaluation')">
         <h3>Evaluation</h3>
-        <p>Findings and ratings from evaluation CSV file.</p>
+        <p>Findings and ratings from Evaluation Google Sheet (CSV feed).</p>
       </div>
 
       <div class="card" onclick="openSection('learning')">
@@ -540,9 +540,9 @@
 
     <!-- MONITORING -->
     <div id="monitoring" class="section">
-      <h2>Monitoring &amp; Control – CSV Feed</h2>
+      <h2>Monitoring &amp; Control – Live CSV Feed</h2>
       <p>
-        The table below is populated from the <code>monitoring_data.csv</code> file stored in this repository.
+        The table below is populated from the ProMEL Monitoring Google Sheet published as a CSV link.
         It is designed to be mobile friendly and scrollable on small screens. Filters at the top will
         also reduce this table to the selected project/period/location.
       </p>
@@ -574,9 +574,9 @@
 
     <!-- EVALUATION -->
     <div id="evaluation" class="section">
-      <h2>Evaluation – CSV Feed</h2>
+      <h2>Evaluation – Live CSV Feed</h2>
       <p>
-        The table below is populated from the <code>evaluation_data.csv</code> file stored in this repository.
+        The table below is populated from the Evaluation Google Sheet published as a CSV link.
         It provides an overview of evaluation phase, overall rating, key findings and recommendations.
         Filters at the top adjust this table as well.
       </p>
@@ -786,8 +786,7 @@
   // EXPECTED CSV HEADERS (LOWERCASE)
   // ============================
 
-  // MONITORING CSV (monitoring_data.csv)
-  // First row should conceptually map to these names once lowercased:
+  // MONITORING CSV (from Google Sheets CSV link)
   //
   // timestamp
   // project name
@@ -806,8 +805,7 @@
   // key challenges / risks
   // immediate actions required / recommendations
   //
-  // EVALUATION CSV (evaluation_data.csv)
-  // First row should conceptually map to these names once lowercased:
+  // EVALUATION CSV (from Google Sheets CSV link)
   //
   // timestamp
   // project name
@@ -893,7 +891,8 @@
 
   // ===== CSV LOADERS =====
   function loadMonitoringTable() {
-    const csvUrl = "monitoring_data.csv";
+    // TODO: replace this URL with your real Monitoring Google Sheets CSV link
+    const csvUrl = "https://docs.google.com/spreadsheets/d/YOUR_MONITORING_SHEET_ID/export?format=csv&gid=YOUR_MONITORING_GID";
 
     fetch(csvUrl)
       .then(response => {
@@ -928,7 +927,8 @@
   }
 
   function loadEvaluationTable() {
-    const csvUrl = "evaluation_data.csv";
+    // TODO: replace this URL with your real Evaluation Google Sheets CSV link
+    const csvUrl = "https://docs.google.com/spreadsheets/d/YOUR_EVALUATION_SHEET_ID/export?format=csv&gid=YOUR_EVALUATION_GID";
 
     fetch(csvUrl)
       .then(response => {

@@ -196,6 +196,47 @@
       font-size: 0.8rem;
       margin-top: 30px;
     }
+
+    /* KPI layout for Overview / Reports / Learning */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 10px 0 16px;
+    }
+
+    .kpi-box {
+      background: var(--primary-light);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .kpi-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    /* Learning list */
+    #learning-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0 0;
+      font-size: 0.8rem;
+    }
+
+    #learning-list li {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
   </style>
 </head>
 
@@ -243,12 +284,36 @@
 
   <!-- Sections -->
 
+  <!-- OVERVIEW: now live, using monitoring & evaluation CSV data -->
   <div id="overview" class="section">
     <h2>Project Overview</h2>
     <p>
-      This section provides a summary view of projects and key PMCEL indicators.
-      It can be expanded later to show aggregated statistics from your data source.
+      Live summary of key PMCEL indicators based on Monitoring &amp; Evaluation data.
     </p>
+
+    <div class="kpi-grid">
+      <div class="kpi-box">
+        <div class="kpi-label">Total Projects</div>
+        <div class="kpi-value" id="ov-total-projects">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Total Monitoring Records</div>
+        <div class="kpi-value" id="ov-total-monitoring">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Total Evaluation Records</div>
+        <div class="kpi-value" id="ov-total-evaluation">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Total Beneficiaries Reached</div>
+        <div class="kpi-value" id="ov-total-beneficiaries">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Overall Performance Score (Activity &amp; Budget)</div>
+        <div class="kpi-value" id="ov-overall-score">0</div>
+      </div>
+    </div>
+
     <button class="close-btn" onclick="closeSection('overview')">Close</button>
   </div>
 
@@ -316,21 +381,43 @@
     <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
   </div>
 
+  <!-- LEARNING: now live, using recent monitoring records -->
   <div id="learning" class="section">
     <h2>Learning &amp; Knowledge</h2>
     <p>
-      Use this space to highlight lessons learned, good practices and management
-      recommendations from your PMCEL system.
+      Recent achievements, challenges and management recommendations from Monitoring data.
     </p>
+
+    <ul id="learning-list">
+      <!-- Live learning items inserted from monitoring_data.csv -->
+    </ul>
+
     <button class="close-btn" onclick="closeSection('learning')">Close</button>
   </div>
 
+  <!-- REPORTS: now live, based on monitoring metadata -->
   <div id="reports" class="section">
     <h2>Reports</h2>
     <p>
-      This section can link to automated monitoring and evaluation reports generated from
-      your data and business intelligence tools.
+      Live reporting status from Monitoring records. This can be expanded later with links
+      to automated narrative or dashboard reports.
     </p>
+
+    <div class="kpi-grid">
+      <div class="kpi-box">
+        <div class="kpi-label">Total Reports Submitted</div>
+        <div class="kpi-value" id="rep-total">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Latest Reporting Period</div>
+        <div class="kpi-value" id="rep-period">N/A</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Latest Reporting Date</div>
+        <div class="kpi-value" id="rep-date">N/A</div>
+      </div>
+    </div>
+
     <button class="close-btn" onclick="closeSection('reports')">Close</button>
   </div>
 
@@ -357,6 +444,10 @@
 </footer>
 
 <script>
+  // Global data arrays (include header row)
+  let monitoringRows = [];
+  let evaluationRows = [];
+
   // Show/Hide sections
   function openSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
@@ -395,6 +486,8 @@
         if (!rows || rows.length === 0) {
           throw new Error("Monitoring CSV file is empty or could not be parsed.");
         }
+
+        monitoringRows = rows; // store globally for KPIs
 
         const thead = document.getElementById('monitoring-head');
         const tbody = document.getElementById('monitoring-body');
@@ -460,6 +553,11 @@
           });
           tbody.appendChild(tr);
         }
+
+        // Update KPI cards that rely on Monitoring data
+        updateOverviewCard();
+        updateLearningCard();
+        updateReportsCard();
       })
       .catch(err => {
         console.error("Error loading Monitoring CSV:", err);
@@ -490,6 +588,8 @@
         if (!rows || rows.length === 0) {
           throw new Error("Evaluation CSV file is empty or could not be parsed.");
         }
+
+        evaluationRows = rows; // store globally for KPIs
 
         const thead = document.getElementById('evaluation-head');
         const tbody = document.getElementById('evaluation-body');
@@ -545,6 +645,9 @@
           });
           tbody.appendChild(tr);
         }
+
+        // Update KPI cards that also use Evaluation data
+        updateOverviewCard();
       })
       .catch(err => {
         console.error("Error loading Evaluation CSV:", err);
@@ -564,6 +667,157 @@
   function parseCSV(text) {
     const lines = text.trim().split("\n");
     return lines.map(line => line.split(","));
+  }
+
+  // ===== KPI / CARD HELPERS =====
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  function averageFieldFromRows(rows, headerRow, headerNameLower) {
+    if (!rows.length || !headerRow.length) return 0;
+    const headers = headerRow.map(h => h.trim().toLowerCase());
+    const idx = headers.indexOf(headerNameLower);
+    if (idx === -1) return 0;
+
+    let sum = 0;
+    let count = 0;
+
+    for (let i = 1; i < rows.length; i++) {
+      const cell = rows[i][idx];
+      const v = parseFloat(cell);
+      if (!isNaN(v)) {
+        sum += v;
+        count++;
+      }
+    }
+
+    return count ? sum / count : 0;
+  }
+
+  // ===== OVERVIEW CARD =====
+  function updateOverviewCard() {
+    if (!monitoringRows.length) return;
+
+    const headerRow = monitoringRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxProject = headersLower.indexOf('project name');
+    const idxBenef   = headersLower.indexOf('number of beneficiaries reached this period.');
+    const idxAct     = headersLower.indexOf('activity implementation on schedule');
+    const idxBud     = headersLower.indexOf('budget utilization as planned');
+
+    const projectSet = new Set();
+    let totalBeneficiaries = 0;
+    let monCount = 0;
+
+    for (let i = 1; i < monitoringRows.length; i++) {
+      const row = monitoringRows[i];
+      if (row.every(c => c.trim() === "")) continue;
+
+      monCount++;
+
+      if (idxProject !== -1 && row[idxProject]) {
+        projectSet.add(row[idxProject].trim());
+      }
+
+      if (idxBenef !== -1 && row[idxBenef] !== undefined) {
+        const b = parseFloat(row[idxBenef]);
+        if (!isNaN(b)) totalBeneficiaries += b;
+      }
+    }
+
+    const totalMonitoring = monCount;
+    const totalEvaluation = evaluationRows.length > 1 ? (evaluationRows.length - 1) : 0;
+
+    const avgActivity = idxAct !== -1
+      ? averageFieldFromRows(monitoringRows, headerRow, 'activity implementation on schedule')
+      : 0;
+
+    const avgBudget = idxBud !== -1
+      ? averageFieldFromRows(monitoringRows, headerRow, 'budget utilization as planned')
+      : 0;
+
+    const overallScore = (avgActivity || avgBudget)
+      ? ((avgActivity + avgBudget) / 2).toFixed(1)
+      : "0";
+
+    setText('ov-total-projects', projectSet.size);
+    setText('ov-total-monitoring', totalMonitoring);
+    setText('ov-total-evaluation', totalEvaluation);
+    setText('ov-total-beneficiaries', totalBeneficiaries);
+    setText('ov-overall-score', overallScore);
+  }
+
+  // ===== LEARNING CARD =====
+  function updateLearningCard() {
+    if (!monitoringRows.length) return;
+
+    const headerRow = monitoringRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxProject      = headersLower.indexOf('project name');
+    const idxPeriod       = headersLower.indexOf('reporting period');
+    const idxAchieve      = headersLower.indexOf('main achievements his period.');
+    const idxChallenges   = headersLower.indexOf('key challenges / risks');
+    const idxActions      = headersLower.indexOf('immediate actions required / recommendations');
+
+    const list = document.getElementById('learning-list');
+    if (!list) return;
+    list.innerHTML = "";
+
+    // Take last 6 non-empty records (most recent)
+    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const recent = dataRows.slice(-6).reverse();
+
+    recent.forEach(row => {
+      const li = document.createElement('li');
+
+      const project = idxProject !== -1 ? (row[idxProject] || '') : '';
+      const period  = idxPeriod  !== -1 ? (row[idxPeriod]  || '') : '';
+
+      const ach  = idxAchieve    !== -1 ? (row[idxAchieve]    || '') : '';
+      const chal = idxChallenges !== -1 ? (row[idxChallenges] || '') : '';
+      const act  = idxActions    !== -1 ? (row[idxActions]    || '') : '';
+
+      li.innerHTML = `
+        <strong>${project}</strong> – ${period}<br>
+        ✅ ${ach}<br>
+        ⚠️ ${chal}<br>
+        📌 ${act}
+      `;
+
+      list.appendChild(li);
+    });
+  }
+
+  // ===== REPORTS CARD =====
+  function updateReportsCard() {
+    if (!monitoringRows.length) return;
+
+    const headerRow = monitoringRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxDate   = headersLower.indexOf('reporting date');
+
+    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const totalReports = dataRows.length;
+
+    let latestPeriod = 'N/A';
+    let latestDate   = 'N/A';
+
+    if (dataRows.length > 0) {
+      const lastRow = dataRows[dataRows.length - 1];
+      if (idxPeriod !== -1) latestPeriod = lastRow[idxPeriod] || 'N/A';
+      if (idxDate   !== -1) latestDate   = lastRow[idxDate]   || 'N/A';
+    }
+
+    setText('rep-total', totalReports);
+    setText('rep-period', latestPeriod);
+    setText('rep-date', latestDate);
   }
 </script>
 

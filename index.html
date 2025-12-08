@@ -27,6 +27,81 @@
       color: #333;
     }
 
+    /* LOGIN SCREEN */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #003366, #005599);
+      color: #fff;
+      padding: 16px;
+    }
+
+    .login-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+    }
+
+    .login-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .login-card p {
+      margin: 0 0 14px;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .login-card label {
+      display: block;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 6px 8px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.85rem;
+    }
+
+    .login-btn {
+      margin-top: 14px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: #ffcc00;
+      color: #003366;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .login-btn:hover {
+      opacity: 0.95;
+    }
+
+    .login-hint {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
+    /* APP ROOT */
+    #app-root {
+      display: none;
+    }
+
     header {
       background: var(--primary);
       color: #fff;
@@ -49,6 +124,33 @@
       padding: 16px;
       max-width: 1100px;
       margin: 0 auto;
+    }
+
+    /* FILTER BAR */
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      background: #e9f1ff;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .filters-bar label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .filters-bar select {
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.8rem;
+      background: #fff;
     }
 
     /* Card grid */
@@ -133,6 +235,7 @@
       border: 1px solid #e0e0e0;
       background: #fff;
       margin-top: 8px;
+      padding: 4px;
     }
 
     table {
@@ -237,216 +340,499 @@
       padding-bottom: 8px;
       border-bottom: 1px solid #eee;
     }
+
+    /* Data entry forms */
+    .data-form {
+      background: #f7f9ff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+    }
+
+    .data-form h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .data-form label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.8rem;
+    }
+
+    .data-form input,
+    .data-form select,
+    .data-form textarea {
+      width: 100%;
+      padding: 5px 6px;
+      margin-top: 3px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 0.8rem;
+    }
+
+    .data-form textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+
+    .data-form button {
+      margin-top: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .data-form button:hover {
+      opacity: 0.9;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>ProMEL Analytics Solutions</h1>
-  <p>Project Monitoring &amp; Control, Evaluation &amp; Learning (PMCEL) Dashboard</p>
-</header>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h2>ProMEL Dashboard Login</h2>
+    <p>Secure access to the PMCEL Monitoring, Evaluation &amp; Learning dashboard.</p>
 
-<div class="container">
+    <form id="login-form">
+      <label for="login-username">Username</label>
+      <input id="login-username" type="text" required>
 
-  <!-- Navigation cards -->
-  <div class="cards">
-    <div class="card" onclick="openSection('overview')">
-      <h3>Overview</h3>
-      <p>High-level project performance summary.</p>
-    </div>
+      <label for="login-password">Password</label>
+      <input id="login-password" type="password" required>
 
-    <div class="card" onclick="openSection('monitoring')">
-      <h3>Monitoring &amp; Control</h3>
-      <p>Live data from ProMEL monitoring CSV file.</p>
-    </div>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
 
-    <div class="card" onclick="openSection('evaluation')">
-      <h3>Evaluation</h3>
-      <p>Findings and ratings from evaluation CSV file.</p>
-    </div>
-
-    <div class="card" onclick="openSection('learning')">
-      <h3>Learning</h3>
-      <p>Lessons learned &amp; adaptive management.</p>
-    </div>
-
-    <div class="card" onclick="openSection('reports')">
-      <h3>Reports</h3>
-      <p>Monitoring and evaluation reporting hub.</p>
-    </div>
-
-    <div class="card" onclick="openSection('powerbi')">
-      <h3>Power BI Dashboard</h3>
-      <p>Integrated business intelligence view.</p>
+    <div class="login-hint">
+      Default (change later in code):<br>
+      <strong>Username:</strong> <code>admin</code><br>
+      <strong>Password:</strong> <code>ProMEL@2025</code>
     </div>
   </div>
-
-  <!-- Sections -->
-
-  <!-- OVERVIEW: now live, using monitoring & evaluation CSV data -->
-  <div id="overview" class="section">
-    <h2>Project Overview</h2>
-    <p>
-      Live summary of key PMCEL indicators based on Monitoring &amp; Evaluation data.
-    </p>
-
-    <div class="kpi-grid">
-      <div class="kpi-box">
-        <div class="kpi-label">Total Projects</div>
-        <div class="kpi-value" id="ov-total-projects">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Total Monitoring Records</div>
-        <div class="kpi-value" id="ov-total-monitoring">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Total Evaluation Records</div>
-        <div class="kpi-value" id="ov-total-evaluation">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Total Beneficiaries Reached</div>
-        <div class="kpi-value" id="ov-total-beneficiaries">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Overall Performance Score (Activity &amp; Budget)</div>
-        <div class="kpi-value" id="ov-overall-score">0</div>
-      </div>
-    </div>
-
-    <button class="close-btn" onclick="closeSection('overview')">Close</button>
-  </div>
-
-  <div id="monitoring" class="section">
-    <h2>Monitoring &amp; Control – CSV Feed</h2>
-    <p>
-      The table below is populated from the <code>monitoring_data.csv</code> file stored in this repository.
-      It is designed to be mobile friendly and scrollable on small screens.
-    </p>
-
-    <div class="table-wrapper">
-      <table>
-        <thead id="monitoring-head">
-          <!-- CSV header row will be inserted here -->
-        </thead>
-        <tbody id="monitoring-body">
-          <!-- CSV data rows will be inserted here -->
-        </tbody>
-      </table>
-    </div>
-
-    <div class="legend">
-      <strong>Monitoring rating colour key (1–5):</strong>
-      <span class="status-bad">1–2 = Off-track / Poor</span>
-      <span class="status-warn">3 = Moderate / Watch</span>
-      <span class="status-good">4–5 = On-track / Good</span>
-    </div>
-
-    <div class="info-note">
-      On mobile, swipe left/right to view all columns.
-    </div>
-
-    <button class="close-btn" onclick="closeSection('monitoring')">Close</button>
-  </div>
-
-  <div id="evaluation" class="section">
-    <h2>Evaluation – CSV Feed</h2>
-    <p>
-      The table below is populated from the <code>evaluation_data.csv</code> file stored in this repository.
-      It provides an overview of evaluation phase, overall rating, key findings and recommendations.
-    </p>
-
-    <div class="table-wrapper">
-      <table>
-        <thead id="evaluation-head">
-          <!-- Evaluation CSV header row will be inserted here -->
-        </thead>
-        <tbody id="evaluation-body">
-          <!-- Evaluation CSV data rows will be inserted here -->
-        </tbody>
-      </table>
-    </div>
-
-    <div class="legend">
-      <strong>Evaluation rating colour key (1–5):</strong>
-      <span class="status-bad">1–2 = Weak / Unsatisfactory</span>
-      <span class="status-warn">3 = Fair / Needs improvement</span>
-      <span class="status-good">4–5 = Good / Strong</span>
-    </div>
-
-    <div class="info-note">
-      On mobile, swipe left/right to view all columns.
-    </div>
-
-    <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
-  </div>
-
-  <!-- LEARNING: now live, using recent monitoring records -->
-  <div id="learning" class="section">
-    <h2>Learning &amp; Knowledge</h2>
-    <p>
-      Recent achievements, challenges and management recommendations from Monitoring data.
-    </p>
-
-    <ul id="learning-list">
-      <!-- Live learning items inserted from monitoring_data.csv -->
-    </ul>
-
-    <button class="close-btn" onclick="closeSection('learning')">Close</button>
-  </div>
-
-  <!-- REPORTS: now live, based on monitoring metadata -->
-  <div id="reports" class="section">
-    <h2>Reports</h2>
-    <p>
-      Live reporting status from Monitoring records. This can be expanded later with links
-      to automated narrative or dashboard reports.
-    </p>
-
-    <div class="kpi-grid">
-      <div class="kpi-box">
-        <div class="kpi-label">Total Reports Submitted</div>
-        <div class="kpi-value" id="rep-total">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Latest Reporting Period</div>
-        <div class="kpi-value" id="rep-period">N/A</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Latest Reporting Date</div>
-        <div class="kpi-value" id="rep-date">N/A</div>
-      </div>
-    </div>
-
-    <button class="close-btn" onclick="closeSection('reports')">Close</button>
-  </div>
-
-  <div id="powerbi" class="section">
-    <h2>Power BI Dashboard</h2>
-    <p>
-      When your Power BI report is ready and published, you can embed it here using an
-      &lt;iframe&gt; from Power BI.
-    </p>
-
-    <!-- Example placeholder only -->
-    <div class="table-wrapper" style="text-align:center; padding:16px; border-style:dashed;">
-      Power BI embed placeholder.<br>
-      Replace this box with the Power BI &lt;iframe&gt; when available.
-    </div>
-
-    <button class="close-btn" onclick="closeSection('powerbi')">Close</button>
-  </div>
-
 </div>
 
-<footer>
-  &copy; 2025 ProMEL Analytics Solutions | Digital PMCEL System
-</footer>
+<!-- APP ROOT -->
+<div id="app-root">
+  <header>
+    <h1>ProMEL Analytics Solutions</h1>
+    <p>Project Monitoring &amp; Control, Evaluation &amp; Learning (PMCEL) Dashboard</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Filters -->
+    <div id="filters-bar" class="filters-bar">
+      <strong>Filters:</strong>
+      <label>
+        Project:
+        <select id="filter-project">
+          <option value="">All</option>
+        </select>
+      </label>
+      <label>
+        Period:
+        <select id="filter-period">
+          <option value="">All</option>
+        </select>
+      </label>
+      <label>
+        Location:
+        <select id="filter-location">
+          <option value="">All</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Navigation cards -->
+    <div class="cards">
+      <div class="card" onclick="openSection('overview')">
+        <h3>Overview</h3>
+        <p>High-level project performance summary.</p>
+      </div>
+
+      <div class="card" onclick="openSection('monitoring')">
+        <h3>Monitoring &amp; Control</h3>
+        <p>Live data from ProMEL monitoring CSV file.</p>
+      </div>
+
+      <div class="card" onclick="openSection('evaluation')">
+        <h3>Evaluation</h3>
+        <p>Findings and ratings from evaluation CSV file.</p>
+      </div>
+
+      <div class="card" onclick="openSection('learning')">
+        <h3>Learning</h3>
+        <p>Lessons learned &amp; adaptive management.</p>
+      </div>
+
+      <div class="card" onclick="openSection('reports')">
+        <h3>Reports</h3>
+        <p>Monitoring and evaluation reporting hub.</p>
+      </div>
+
+      <div class="card" onclick="openSection('dataentry')">
+        <h3>Data Entry</h3>
+        <p>Quick Monitoring &amp; Evaluation input forms.</p>
+      </div>
+
+      <div class="card" onclick="openSection('powerbi')">
+        <h3>Power BI Dashboard</h3>
+        <p>Integrated business intelligence view.</p>
+      </div>
+    </div>
+
+    <!-- Sections -->
+
+    <!-- OVERVIEW -->
+    <div id="overview" class="section">
+      <h2>Project Overview</h2>
+      <p>
+        Live summary of key PMCEL indicators based on Monitoring &amp; Evaluation data.
+        Filters at the top (Project, Period, Location) adjust the figures below.
+      </p>
+
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label">Total Projects</div>
+          <div class="kpi-value" id="ov-total-projects">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Total Monitoring Records</div>
+          <div class="kpi-value" id="ov-total-monitoring">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Total Evaluation Records</div>
+          <div class="kpi-value" id="ov-total-evaluation">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Total Beneficiaries Reached</div>
+          <div class="kpi-value" id="ov-total-beneficiaries">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Overall Performance Score (Activity &amp; Budget)</div>
+          <div class="kpi-value" id="ov-overall-score">0</div>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:12px;">
+        <canvas id="chart-avg-ratings"></canvas>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:12px;">
+        <canvas id="chart-beneficiaries"></canvas>
+      </div>
+
+      <button class="close-btn" onclick="closeSection('overview')">Close</button>
+    </div>
+
+    <!-- MONITORING -->
+    <div id="monitoring" class="section">
+      <h2>Monitoring &amp; Control – CSV Feed</h2>
+      <p>
+        The table below is populated from the <code>monitoring_data.csv</code> file stored in this repository.
+        It is designed to be mobile friendly and scrollable on small screens. Filters at the top will
+        also reduce this table to the selected project/period/location.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead id="monitoring-head">
+            <!-- CSV header row will be inserted here -->
+          </thead>
+          <tbody id="monitoring-body">
+            <!-- CSV data rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <strong>Monitoring rating colour key (1–5):</strong>
+        <span class="status-bad">1–2 = Off-track / Poor</span>
+        <span class="status-warn">3 = Moderate / Watch</span>
+        <span class="status-good">4–5 = On-track / Good</span>
+      </div>
+
+      <div class="info-note">
+        On mobile, swipe left/right to view all columns.
+      </div>
+
+      <button class="close-btn" onclick="closeSection('monitoring')">Close</button>
+    </div>
+
+    <!-- EVALUATION -->
+    <div id="evaluation" class="section">
+      <h2>Evaluation – CSV Feed</h2>
+      <p>
+        The table below is populated from the <code>evaluation_data.csv</code> file stored in this repository.
+        It provides an overview of evaluation phase, overall rating, key findings and recommendations.
+        Filters at the top adjust this table as well.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead id="evaluation-head">
+            <!-- Evaluation CSV header row will be inserted here -->
+          </thead>
+          <tbody id="evaluation-body">
+            <!-- Evaluation CSV data rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <strong>Evaluation rating colour key (1–5):</strong>
+        <span class="status-bad">1–2 = Weak / Unsatisfactory</span>
+        <span class="status-warn">3 = Fair / Needs improvement</span>
+        <span class="status-good">4–5 = Good / Strong</span>
+      </div>
+
+      <div class="info-note">
+        On mobile, swipe left/right to view all columns.
+      </div>
+
+      <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
+    </div>
+
+    <!-- LEARNING -->
+    <div id="learning" class="section">
+      <h2>Learning &amp; Knowledge</h2>
+      <p>
+        Recent achievements, challenges and management recommendations from Monitoring data,
+        filtered by the selections at the top.
+      </p>
+
+      <ul id="learning-list">
+        <!-- Live learning items inserted from monitoring_data.csv -->
+      </ul>
+
+      <button class="close-btn" onclick="closeSection('learning')">Close</button>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="reports" class="section">
+      <h2>Reports</h2>
+      <p>
+        Live reporting status from Monitoring records. You can also export a quick PDF summary
+        of the Overview KPIs for management or donors.
+      </p>
+
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label">Total Reports Submitted</div>
+          <div class="kpi-value" id="rep-total">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Latest Reporting Period</div>
+          <div class="kpi-value" id="rep-period">N/A</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Latest Reporting Date</div>
+          <div class="kpi-value" id="rep-date">N/A</div>
+        </div>
+      </div>
+
+      <button class="close-btn" onclick="generatePDFReport()">Download PDF Summary</button>
+      <button class="close-btn" style="margin-left:6px;" onclick="closeSection('reports')">Close</button>
+    </div>
+
+    <!-- DATA ENTRY -->
+    <div id="dataentry" class="section">
+      <h2>Data Entry (Monitoring &amp; Evaluation)</h2>
+      <p>
+        These forms are a front-end template. To send data directly into Google Sheets, connect
+        them to a Google Apps Script Web App or Google Form endpoint in the JavaScript code.
+      </p>
+
+      <div class="kpi-grid">
+        <form id="monitoring-entry-form" class="data-form">
+          <h3>Monitoring Input</h3>
+          <label>
+            Project Name
+            <input name="projectName" required>
+          </label>
+          <label>
+            Reporting Period
+            <input name="reportingPeriod" placeholder="e.g. Quarter 4, 2025" required>
+          </label>
+          <label>
+            Province / District / Location
+            <input name="location">
+          </label>
+          <label>
+            Activity Implementation on Schedule (1–5)
+            <input name="activityRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Budget Utilization as Planned (1–5)
+            <input name="budgetRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Staff Availability (1–5)
+            <input name="staffRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Community Participation (1–5)
+            <input name="communityRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Coordination with Partners (1–5)
+            <input name="coordinationRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Number of Beneficiaries Reached
+            <input name="beneficiaries" type="number" min="0">
+          </label>
+          <label>
+            Main Achievements this Period
+            <textarea name="achievements"></textarea>
+          </label>
+          <label>
+            Key Challenges / Risks
+            <textarea name="challenges"></textarea>
+          </label>
+          <label>
+            Immediate Actions / Recommendations
+            <textarea name="actions"></textarea>
+          </label>
+          <button type="submit">Submit Monitoring Entry (Demo)</button>
+        </form>
+
+        <form id="evaluation-entry-form" class="data-form">
+          <h3>Evaluation Input</h3>
+          <label>
+            Project Name
+            <input name="evalProjectName" required>
+          </label>
+          <label>
+            Evaluation Phase
+            <input name="evalPhase" placeholder="Mid-term / Final / Review">
+          </label>
+          <label>
+            Outcome Rating (1–5)
+            <input name="outcomeRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Impact Rating (1–5)
+            <input name="impactRating" type="number" min="1" max="5">
+          </label>
+          <label>
+            Key Findings
+            <textarea name="findings"></textarea>
+          </label>
+          <label>
+            Recommendations
+            <textarea name="evalRecommendations"></textarea>
+          </label>
+          <button type="submit">Submit Evaluation Entry (Demo)</button>
+        </form>
+      </div>
+
+      <button class="close-btn" onclick="closeSection('dataentry')">Close</button>
+    </div>
+
+    <!-- POWER BI -->
+    <div id="powerbi" class="section">
+      <h2>Power BI Dashboard</h2>
+      <p>
+        When your Power BI report is ready and published, you can embed it here using an
+        &lt;iframe&gt; from Power BI.
+      </p>
+
+      <!-- Example placeholder only -->
+      <div class="table-wrapper" style="text-align:center; padding:16px; border-style:dashed;">
+        Power BI embed placeholder.<br>
+        Replace this box with the Power BI &lt;iframe&gt; when available.
+      </div>
+
+      <button class="close-btn" onclick="closeSection('powerbi')">Close</button>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2025 ProMEL Analytics Solutions | Digital PMCEL System
+  </footer>
+</div>
+
+<!-- External libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
   // Global data arrays (include header row)
   let monitoringRows = [];
   let evaluationRows = [];
+  let monitoringFilteredRows = [];
+  let evaluationFilteredRows = [];
+  let filtersInitialized = false;
+
+  let avgRatingsChart = null;
+  let beneficiariesChart = null;
+
+  // LOGIN & INIT
+  document.addEventListener('DOMContentLoaded', function () {
+    const loginScreen = document.getElementById('login-screen');
+    const appRoot = document.getElementById('app-root');
+    const loginForm = document.getElementById('login-form');
+
+    const isLoggedIn = localStorage.getItem('promelLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+      loginScreen.style.display = 'none';
+      appRoot.style.display = 'block';
+      initApp();
+    } else {
+      loginScreen.style.display = 'flex';
+      appRoot.style.display = 'none';
+    }
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const user = document.getElementById('login-username').value.trim();
+        const pass = document.getElementById('login-password').value.trim();
+
+        // Simple credentials (change to your own)
+        if (user === 'admin' && pass === 'ProMEL@2025') {
+          localStorage.setItem('promelLoggedIn', 'true');
+          loginScreen.style.display = 'none';
+          appRoot.style.display = 'block';
+          initApp();
+        } else {
+          alert('Invalid username or password.');
+        }
+      });
+    }
+  });
+
+  function initApp() {
+    loadMonitoringTable();
+    loadEvaluationTable();
+    setupFilterListeners();
+    setupDataEntryForms();
+    setupAutoRefresh();
+  }
+
+  function setupAutoRefresh() {
+    // Refresh monitoring & evaluation data every 60 seconds
+    setInterval(() => {
+      loadMonitoringTable();
+      loadEvaluationTable();
+    }, 60000);
+  }
 
   // Show/Hide sections
   function openSection(id) {
@@ -466,11 +852,6 @@
   }
 
   // ===== CSV LOADERS =====
-  document.addEventListener('DOMContentLoaded', function () {
-    loadMonitoringTable();
-    loadEvaluationTable();
-  });
-
   function loadMonitoringTable() {
     const csvUrl = "monitoring_data.csv";
 
@@ -487,82 +868,15 @@
           throw new Error("Monitoring CSV file is empty or could not be parsed.");
         }
 
-        monitoringRows = rows; // store globally for KPIs
-
-        const thead = document.getElementById('monitoring-head');
-        const tbody = document.getElementById('monitoring-body');
-
-        thead.innerHTML = "";
-        tbody.innerHTML = "";
-
-        // First row = header
-        const headerRow = document.createElement('tr');
-        rows[0].forEach(cell => {
-          const th = document.createElement('th');
-          th.textContent = cell;
-          headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        // Identify rating columns by header name
-        const headerNames = rows[0].map(h => h.trim().toLowerCase());
-        const ratingHeaders = [
-          "activity implementation on schedule",
-          "budget utilization as planned",
-          "staff availability",
-          "community participation",
-          "coordination with partners"
-        ];
-        const ratingIndices = [];
-
-        headerNames.forEach((name, idx) => {
-          ratingHeaders.forEach(target => {
-            if (name === target) {
-              ratingIndices.push(idx);
-            }
-          });
-        });
-
-        // Data rows
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (row.every(c => c.trim() === "")) continue; // skip empty rows
-
-          const tr = document.createElement('tr');
-
-          row.forEach((cell, idx) => {
-            const td = document.createElement('td');
-            const text = cell.trim();
-            td.textContent = text;
-
-            // Apply colours if this column is one of the rating indices
-            if (ratingIndices.includes(idx) && text !== "") {
-              const value = parseFloat(text);
-              if (!isNaN(value)) {
-                if (value >= 4) {
-                  td.classList.add("status-good");   // 4–5
-                } else if (value <= 2) {
-                  td.classList.add("status-bad");    // 1–2
-                } else if (value === 3) {
-                  td.classList.add("status-warn");   // 3
-                }
-              }
-            }
-
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        }
-
-        // Update KPI cards that rely on Monitoring data
-        updateOverviewCard();
-        updateLearningCard();
-        updateReportsCard();
+        monitoringRows = rows;
+        buildMonitoringFilters();
+        applyFilters(); // will render table + KPIs + charts
       })
       .catch(err => {
         console.error("Error loading Monitoring CSV:", err);
         const tbody = document.getElementById('monitoring-body');
         if (tbody) {
+          tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
           td.colSpan = 4;
@@ -589,70 +903,14 @@
           throw new Error("Evaluation CSV file is empty or could not be parsed.");
         }
 
-        evaluationRows = rows; // store globally for KPIs
-
-        const thead = document.getElementById('evaluation-head');
-        const tbody = document.getElementById('evaluation-body');
-
-        thead.innerHTML = "";
-        tbody.innerHTML = "";
-
-        // First row = header
-        const headerRow = document.createElement('tr');
-        rows[0].forEach(cell => {
-          const th = document.createElement('th');
-          th.textContent = cell;
-          headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        // Find rating column (header contains 'rating')
-        const headerNames = rows[0].map(h => h.trim().toLowerCase());
-        let ratingIndex = -1;
-        headerNames.forEach((name, idx) => {
-          if (name.includes("rating") && ratingIndex === -1) {
-            ratingIndex = idx;
-          }
-        });
-
-        // Data rows
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (row.every(c => c.trim() === "")) continue; // skip empty rows
-
-          const tr = document.createElement('tr');
-
-          row.forEach((cell, idx) => {
-            const td = document.createElement('td');
-            const text = cell.trim();
-            td.textContent = text;
-
-            // Apply colours if this is the rating column
-            if (ratingIndex === idx && text !== "") {
-              const value = parseFloat(text);
-              if (!isNaN(value)) {
-                if (value >= 4) {
-                  td.classList.add("status-good");   // 4–5
-                } else if (value <= 2) {
-                  td.classList.add("status-bad");    // 1–2
-                } else if (value === 3) {
-                  td.classList.add("status-warn");   // 3
-                }
-              }
-            }
-
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        }
-
-        // Update KPI cards that also use Evaluation data
-        updateOverviewCard();
+        evaluationRows = rows;
+        applyFilters(); // re-apply filters so Overview & Evaluation table refresh
       })
       .catch(err => {
         console.error("Error loading Evaluation CSV:", err);
         const tbody = document.getElementById('evaluation-body');
         if (tbody) {
+          tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
           td.colSpan = 4;
@@ -667,6 +925,307 @@
   function parseCSV(text) {
     const lines = text.trim().split("\n");
     return lines.map(line => line.split(","));
+  }
+
+  // ===== FILTERS =====
+  function setupFilterListeners() {
+    if (filtersInitialized) return;
+
+    const projSel = document.getElementById('filter-project');
+    const periodSel = document.getElementById('filter-period');
+    const locSel = document.getElementById('filter-location');
+
+    function onChange() {
+      applyFilters();
+    }
+
+    if (projSel) projSel.addEventListener('change', onChange);
+    if (periodSel) periodSel.addEventListener('change', onChange);
+    if (locSel) locSel.addEventListener('change', onChange);
+
+    filtersInitialized = true;
+  }
+
+  function buildMonitoringFilters() {
+    if (!monitoringRows.length) return;
+
+    const headerRow = monitoringRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxLocation = headersLower.indexOf('province / district / location');
+
+    const projSel = document.getElementById('filter-project');
+    const periodSel = document.getElementById('filter-period');
+    const locSel = document.getElementById('filter-location');
+    if (!projSel || !periodSel || !locSel) return;
+
+    const currentProj = projSel.value;
+    const currentPeriod = periodSel.value;
+    const currentLoc = locSel.value;
+
+    const projects = new Set();
+    const periods = new Set();
+    const locations = new Set();
+
+    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+
+    dataRows.forEach(row => {
+      if (idxProject !== -1 && row[idxProject]) {
+        projects.add(row[idxProject].trim());
+      }
+      if (idxPeriod !== -1 && row[idxPeriod]) {
+        periods.add(row[idxPeriod].trim());
+      }
+      if (idxLocation !== -1 && row[idxLocation]) {
+        locations.add(row[idxLocation].trim());
+      }
+    });
+
+    function refillSelect(select, values, currentVal) {
+      const oldVal = currentVal;
+      select.innerHTML = "";
+      const allOpt = document.createElement('option');
+      allOpt.value = "";
+      allOpt.textContent = "All";
+      select.appendChild(allOpt);
+      Array.from(values).sort().forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+      });
+      if (oldVal && values.has(oldVal)) {
+        select.value = oldVal;
+      } else {
+        select.value = "";
+      }
+    }
+
+    refillSelect(projSel, projects, currentProj);
+    refillSelect(periodSel, periods, currentPeriod);
+    refillSelect(locSel, locations, currentLoc);
+  }
+
+  function applyFilters() {
+    const projSel = document.getElementById('filter-project');
+    const periodSel = document.getElementById('filter-period');
+    const locSel = document.getElementById('filter-location');
+
+    const project = projSel ? projSel.value : "";
+    const period = periodSel ? periodSel.value : "";
+    const location = locSel ? locSel.value : "";
+
+    monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);
+    evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
+
+    const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+    const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
+
+    renderMonitoringTable(monitorForView);
+    renderEvaluationTable(evalForView);
+
+    updateOverviewCard(monitorForView, evalForView);
+    updateLearningCard(monitorForView);
+    updateReportsCard(monitorForView);
+    updateCharts(monitorForView);
+  }
+
+  function filterMonitoringRows(allRows, project, period, location) {
+    if (!allRows.length || allRows.length <= 1) return [];
+
+    const headerRow = allRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxLocation = headersLower.indexOf('province / district / location');
+
+    const filteredDataRows = allRows.slice(1).filter(row => {
+      if (row.every(c => c.trim() === "")) return false;
+      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
+      const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
+
+      const matchProj = project ? p === project : true;
+      const matchPer = period ? per === period : true;
+      const matchLoc = location ? loc === location : true;
+      return matchProj && matchPer && matchLoc;
+    });
+
+    if (!filteredDataRows.length) return [];
+    return [headerRow].concat(filteredDataRows);
+  }
+
+  function filterEvaluationRows(allRows, project, period) {
+    if (!allRows.length || allRows.length <= 1) return [];
+
+    const headerRow = allRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
+
+    const filteredDataRows = allRows.slice(1).filter(row => {
+      if (row.every(c => c.trim() === "")) return false;
+      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
+
+      const matchProj = project ? p === project : true;
+      const matchPer = period ? per === period : true;
+      return matchProj && matchPer;
+    });
+
+    if (!filteredDataRows.length) return [];
+    return [headerRow].concat(filteredDataRows);
+  }
+
+  // ===== TABLE RENDERERS =====
+  function renderMonitoringTable(rows) {
+    const thead = document.getElementById('monitoring-head');
+    const tbody = document.getElementById('monitoring-body');
+    if (!thead || !tbody) return;
+
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+    if (!rows || !rows.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = "No monitoring records found for current filter selection.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    // Header row
+    const headerRow = document.createElement('tr');
+    rows[0].forEach(cell => {
+      const th = document.createElement('th');
+      th.textContent = cell;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Identify rating columns by header name
+    const headerNames = rows[0].map(h => h.trim().toLowerCase());
+    const ratingHeaders = [
+      "activity implementation on schedule",
+      "budget utilization as planned",
+      "staff availability",
+      "community participation",
+      "coordination with partners"
+    ];
+    const ratingIndices = [];
+
+    headerNames.forEach((name, idx) => {
+      ratingHeaders.forEach(target => {
+        if (name === target) {
+          ratingIndices.push(idx);
+        }
+      });
+    });
+
+    // Data rows
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row.every(c => c.trim() === "")) continue;
+
+      const tr = document.createElement('tr');
+
+      row.forEach((cell, idx) => {
+        const td = document.createElement('td');
+        const text = cell.trim();
+        td.textContent = text;
+
+        // Apply colours if this column is one of the rating indices
+        if (ratingIndices.includes(idx) && text !== "") {
+          const value = parseFloat(text);
+          if (!isNaN(value)) {
+            if (value >= 4) {
+              td.classList.add("status-good");   // 4–5
+            } else if (value <= 2) {
+              td.classList.add("status-bad");    // 1–2
+            } else if (value === 3) {
+              td.classList.add("status-warn");   // 3
+            }
+          }
+        }
+
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderEvaluationTable(rows) {
+    const thead = document.getElementById('evaluation-head');
+    const tbody = document.getElementById('evaluation-body');
+    if (!thead || !tbody) return;
+
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+    if (!rows || !rows.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = "No evaluation records found for current filter selection.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    // Header row
+    const headerRow = document.createElement('tr');
+    rows[0].forEach(cell => {
+      const th = document.createElement('th');
+      th.textContent = cell;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Find rating column (header contains 'rating')
+    const headerNames = rows[0].map(h => h.trim().toLowerCase());
+    let ratingIndex = -1;
+    headerNames.forEach((name, idx) => {
+      if (name.includes("rating") && ratingIndex === -1) {
+        ratingIndex = idx;
+      }
+    });
+
+    // Data rows
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row.every(c => c.trim() === "")) continue;
+
+      const tr = document.createElement('tr');
+
+      row.forEach((cell, idx) => {
+        const td = document.createElement('td');
+        const text = cell.trim();
+        td.textContent = text;
+
+        // Apply colours if this is the rating column
+        if (ratingIndex === idx && text !== "") {
+          const value = parseFloat(text);
+          if (!isNaN(value)) {
+            if (value >= 4) {
+              td.classList.add("status-good");   // 4–5
+            } else if (value <= 2) {
+              td.classList.add("status-bad");    // 1–2
+            } else if (value === 3) {
+              td.classList.add("status-warn");   // 3
+            }
+          }
+        }
+
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
   }
 
   // ===== KPI / CARD HELPERS =====
@@ -698,10 +1257,10 @@
   }
 
   // ===== OVERVIEW CARD =====
-  function updateOverviewCard() {
-    if (!monitoringRows.length) return;
+  function updateOverviewCard(monitorRows, evalRows) {
+    if (!monitorRows || !monitorRows.length) return;
 
-    const headerRow = monitoringRows[0];
+    const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxProject = headersLower.indexOf('project name');
@@ -713,8 +1272,8 @@
     let totalBeneficiaries = 0;
     let monCount = 0;
 
-    for (let i = 1; i < monitoringRows.length; i++) {
-      const row = monitoringRows[i];
+    for (let i = 1; i < monitorRows.length; i++) {
+      const row = monitorRows[i];
       if (row.every(c => c.trim() === "")) continue;
 
       monCount++;
@@ -730,14 +1289,14 @@
     }
 
     const totalMonitoring = monCount;
-    const totalEvaluation = evaluationRows.length > 1 ? (evaluationRows.length - 1) : 0;
+    const totalEvaluation = evalRows && evalRows.length > 1 ? (evalRows.length - 1) : 0;
 
     const avgActivity = idxAct !== -1
-      ? averageFieldFromRows(monitoringRows, headerRow, 'activity implementation on schedule')
+      ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule')
       : 0;
 
     const avgBudget = idxBud !== -1
-      ? averageFieldFromRows(monitoringRows, headerRow, 'budget utilization as planned')
+      ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned')
       : 0;
 
     const overallScore = (avgActivity || avgBudget)
@@ -752,10 +1311,15 @@
   }
 
   // ===== LEARNING CARD =====
-  function updateLearningCard() {
-    if (!monitoringRows.length) return;
+  function updateLearningCard(monitorRows) {
+    const list = document.getElementById('learning-list');
+    if (!list) return;
 
-    const headerRow = monitoringRows[0];
+    list.innerHTML = "";
+
+    if (!monitorRows || !monitorRows.length) return;
+
+    const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxProject      = headersLower.indexOf('project name');
@@ -764,12 +1328,7 @@
     const idxChallenges   = headersLower.indexOf('key challenges / risks');
     const idxActions      = headersLower.indexOf('immediate actions required / recommendations');
 
-    const list = document.getElementById('learning-list');
-    if (!list) return;
-    list.innerHTML = "";
-
-    // Take last 6 non-empty records (most recent)
-    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
     const recent = dataRows.slice(-6).reverse();
 
     recent.forEach(row => {
@@ -794,16 +1353,16 @@
   }
 
   // ===== REPORTS CARD =====
-  function updateReportsCard() {
-    if (!monitoringRows.length) return;
+  function updateReportsCard(monitorRows) {
+    if (!monitorRows || !monitorRows.length) return;
 
-    const headerRow = monitoringRows[0];
+    const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxDate   = headersLower.indexOf('reporting date');
 
-    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
     const totalReports = dataRows.length;
 
     let latestPeriod = 'N/A';
@@ -818,6 +1377,150 @@
     setText('rep-total', totalReports);
     setText('rep-period', latestPeriod);
     setText('rep-date', latestDate);
+  }
+
+  // ===== CHARTS =====
+  function updateCharts(monitorRows) {
+    const ctx1 = document.getElementById('chart-avg-ratings');
+    const ctx2 = document.getElementById('chart-beneficiaries');
+
+    if (!monitorRows || !monitorRows.length || !ctx1 || !ctx2) return;
+
+    const headerRow = monitorRows[0];
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+
+    const idxAct   = headersLower.indexOf('activity implementation on schedule');
+    const idxBud   = headersLower.indexOf('budget utilization as planned');
+    const idxStaff = headersLower.indexOf('staff availability');
+    const idxComm  = headersLower.indexOf('community participation');
+    const idxCoord = headersLower.indexOf('coordination with partners');
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxBenef  = headersLower.indexOf('number of beneficiaries reached this period.');
+
+    // Chart 1: Average ratings
+    const avgActivity = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule') : 0;
+    const avgBudget   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned') : 0;
+    const avgStaff    = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'staff availability') : 0;
+    const avgComm     = idxComm  !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'community participation') : 0;
+    const avgCoord    = idxCoord !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'coordination with partners') : 0;
+
+    const ratingLabels = ['Activity', 'Budget', 'Staff', 'Community', 'Coordination'];
+    const ratingData = [avgActivity, avgBudget, avgStaff, avgComm, avgCoord];
+
+    if (avgRatingsChart) avgRatingsChart.destroy();
+    avgRatingsChart = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ratingLabels,
+        datasets: [{
+          label: 'Average Rating (1–5)',
+          data: ratingData
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 5
+          }
+        }
+      }
+    });
+
+    // Chart 2: Beneficiaries by period
+    const periodMap = new Map();
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+
+    dataRows.forEach(row => {
+      if (idxPeriod === -1 || idxBenef === -1) return;
+      const per = (row[idxPeriod] || '').trim();
+      const b = parseFloat(row[idxBenef] || '0');
+      if (!per || isNaN(b)) return;
+      const current = periodMap.get(per) || 0;
+      periodMap.set(per, current + b);
+    });
+
+    const periodLabels = Array.from(periodMap.keys());
+    const benefData = Array.from(periodMap.values());
+
+    if (beneficiariesChart) beneficiariesChart.destroy();
+    beneficiariesChart = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: periodLabels,
+        datasets: [{
+          label: 'Total Beneficiaries',
+          data: benefData,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  // ===== PDF REPORT =====
+  function generatePDFReport() {
+    try {
+      const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDF) {
+        alert("PDF library not loaded.");
+        return;
+      }
+
+      const proj = document.getElementById('ov-total-projects')?.textContent || '0';
+      const mon = document.getElementById('ov-total-monitoring')?.textContent || '0';
+      const evl = document.getElementById('ov-total-evaluation')?.textContent || '0';
+      const ben = document.getElementById('ov-total-beneficiaries')?.textContent || '0';
+      const score = document.getElementById('ov-overall-score')?.textContent || '0';
+
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.text('ProMEL PMCEL Summary Report', 10, 12);
+
+      doc.setFontSize(10);
+      doc.text('Overview (based on current filters):', 10, 22);
+      doc.text('Total Projects: ' + proj, 10, 30);
+      doc.text('Total Monitoring Records: ' + mon, 10, 36);
+      doc.text('Total Evaluation Records: ' + evl, 10, 42);
+      doc.text('Total Beneficiaries Reached: ' + ben, 10, 48);
+      doc.text('Overall Performance Score (Activity & Budget): ' + score, 10, 54);
+
+      doc.text('Generated by ProMEL Analytics Solutions', 10, 70);
+
+      doc.save('ProMEL_PMEL_Report.pdf');
+    } catch (e) {
+      console.error(e);
+      alert('Unable to generate PDF report. See console for details.');
+    }
+  }
+
+  // ===== DATA ENTRY FORMS (DEMO HOOKS) =====
+  function setupDataEntryForms() {
+    const monForm = document.getElementById('monitoring-entry-form');
+    const evalForm = document.getElementById('evaluation-entry-form');
+
+    if (monForm) {
+      monForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        alert('Monitoring entry captured in the browser.\n\nTo send this to Google Sheets, connect this form to a Google Apps Script Web App endpoint.');
+      });
+    }
+
+    if (evalForm) {
+      evalForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        alert('Evaluation entry captured in the browser.\n\nTo send this to Google Sheets, connect this form to a Google Apps Script Web App endpoint.');
+      });
+    }
   }
 </script>
 

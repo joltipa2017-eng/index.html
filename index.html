@@ -395,6 +395,103 @@
     canvas {
       max-width: 100%;
     }
+
+    /* ===========================
+       AI ASSISTANT (OPENAI) UI
+       =========================== */
+
+    .ai-chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-input-panel,
+    .ai-output-panel {
+      background: #f7f9ff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    .ai-input-panel h3,
+    .ai-output-panel h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .ai-input-panel label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.8rem;
+    }
+
+    .ai-input-panel select,
+    .ai-input-panel textarea {
+      width: 100%;
+      padding: 5px 6px;
+      margin-top: 3px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 0.8rem;
+    }
+
+    .ai-input-panel textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .ai-input-panel button {
+      margin-top: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .ai-input-panel button:hover {
+      opacity: 0.9;
+    }
+
+    .ai-inline-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+    }
+
+    #ai-response-box {
+      background: #ffffff;
+      border-radius: 8px;
+      min-height: 80px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid #dde3f3;
+      white-space: pre-wrap;
+      font-size: 0.8rem;
+    }
+
+    #ai-status {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #555;
+    }
+
+    @media (min-width: 768px) {
+      .ai-chat-container {
+        flex-direction: row;
+      }
+      .ai-input-panel,
+      .ai-output-panel {
+        flex: 1;
+      }
+    }
   </style>
 </head>
 
@@ -492,6 +589,11 @@
         <h3>Power BI Dashboard</h3>
         <p>Integrated business intelligence view.</p>
       </div>
+
+      <div class="card" onclick="openSection('openai')">
+        <h3>AI Assistant (OpenAI)</h3>
+        <p>Analyse trends &amp; generate MEL reports.</p>
+      </div>
     </div>
 
     <!-- Sections -->
@@ -525,20 +627,6 @@
           <div class="kpi-label">Overall Performance Score (Activity &amp; Budget)</div>
           <div class="kpi-value" id="ov-overall-score">0</div>
         </div>
-
-        <!-- NEW EVALUATION KPI BOXES -->
-        <div class="kpi-box">
-          <div class="kpi-label">Avg Outcome Rating (1–5)</div>
-          <div class="kpi-value" id="ov-avg-outcome">0</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Avg Impact Rating (1–5)</div>
-          <div class="kpi-value" id="ov-avg-impact">0</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-label">Avg Overall Evaluation Rating (1–5)</div>
-          <div class="kpi-value" id="ov-avg-overall">0</div>
-        </div>
       </div>
 
       <div class="table-wrapper" style="margin-top:12px;">
@@ -547,11 +635,6 @@
 
       <div class="table-wrapper" style="margin-top:12px;">
         <canvas id="chart-beneficiaries"></canvas>
-      </div>
-
-      <!-- NEW EVALUATION CHART -->
-      <div class="table-wrapper" style="margin-top:12px;">
-        <canvas id="chart-eval-ratings"></canvas>
       </div>
 
       <button class="close-btn" onclick="closeSection('overview')">Close</button>
@@ -779,6 +862,56 @@
       <button class="close-btn" onclick="closeSection('powerbi')">Close</button>
     </div>
 
+    <!-- OPENAI ASSISTANT -->
+    <div id="openai" class="section">
+      <h2>AI Assistant (OpenAI) – ProMEL Reasoning &amp; Reports</h2>
+      <p>
+        Use this assistant to interpret Monitoring &amp; Evaluation data, explain trends, and draft
+        narrative reports for donors or management. It sends your prompt and selected dashboard context
+        to a secure backend API which then talks to OpenAI.
+      </p>
+
+      <div class="ai-chat-container">
+        <!-- INPUT SIDE -->
+        <div class="ai-input-panel">
+          <h3>Ask ProMEL AI</h3>
+
+          <label for="ai-mode">Analysis focus</label>
+          <select id="ai-mode">
+            <option value="explain_trends">Explain current trends & risks</option>
+            <option value="draft_report">Draft narrative report (Monitoring & Evaluation)</option>
+            <option value="learning_summary">Summarise key lessons & recommendations</option>
+            <option value="design_questions">Design MEL questions / indicators</option>
+            <option value="custom">Custom analysis</option>
+          </select>
+
+          <label for="ai-prompt">Prompt / question</label>
+          <textarea
+            id="ai-prompt"
+            placeholder="e.g. Explain the current status of the Function and Expenditure Review project based on the latest Monitoring & Evaluation data and highlight any critical risks."
+          ></textarea>
+
+          <div class="ai-inline-checkbox">
+            <input type="checkbox" id="ai-include-filters" checked>
+            <label for="ai-include-filters">Include current filters & KPI summary in analysis</label>
+          </div>
+
+          <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI</button>
+          <div id="ai-status" class="info-note"></div>
+        </div>
+
+        <!-- OUTPUT SIDE -->
+        <div class="ai-output-panel">
+          <h3>AI Response</h3>
+          <div id="ai-response-box">
+            <!-- AI answer from backend will appear here -->
+          </div>
+        </div>
+      </div>
+
+      <button class="close-btn" onclick="closeSection('openai')">Close</button>
+    </div>
+
   </div>
 
   <footer>
@@ -791,6 +924,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+  // ===========================
+  // CONFIG: BACKEND AI ENDPOINT
+  // ===========================
+  // IMPORTANT:
+  // 1. Do NOT call OpenAI directly from this HTML. Your API key must stay secret.
+  // 2. Deploy a secure backend (e.g. on Render, Railway, Cloudflare Workers, etc.)
+  // 3. That backend should receive JSON from this page, call OpenAI, and return a reply.
+  //
+  // Replace the URL below with your real backend endpoint:
+  const AI_API_URL = "https://your-server.example.com/api/pas-ai-chat";
+
   // Global data arrays (include header row)
   let monitoringRows = [];
   let evaluationRows = [];
@@ -800,45 +944,6 @@
 
   let avgRatingsChart = null;
   let beneficiariesChart = null;
-  let evalRatingsChart = null;
-
-  // ============================
-  // EXPECTED CSV HEADERS (LOWERCASE)
-  // ============================
-
-  // MONITORING CSV (from Google Sheets CSV link)
-  //
-  // timestamp
-  // project name
-  // project code
-  // implementing agency / organization
-  // province / district / location
-  // reporting period
-  // reporting date
-  // activity implementation on schedule
-  // budget utilization as planned
-  // staff availability
-  // community participation
-  // coordination with partners
-  // number of beneficiaries reached this period.
-  // main achievements this period.
-  // key challenges / risks
-  // immediate actions required / recommendations
-  //
-  // EVALUATION CSV (from Google Sheets CSV link)
-  //
-  // timestamp
-  // project name
-  // project code
-  // implementing agency / organization
-  // province / district / location
-  // reporting period
-  // evaluation phase
-  // outcome rating
-  // impact rating
-  // overall rating
-  // key findings
-  // recommendations
 
   // LOGIN & INIT
   document.addEventListener('DOMContentLoaded', function () {
@@ -1089,7 +1194,7 @@
     updateOverviewCard(monitorForView, evalForView);
     updateLearningCard(monitorForView);
     updateReportsCard(monitorForView);
-    updateCharts(monitorForView, evalForView);
+    updateCharts(monitorForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
@@ -1247,23 +1352,14 @@
     });
     thead.appendChild(headerRow);
 
-    // Find rating column (header contains 'rating') – keep generic for now
+    // Find rating column (header contains 'rating')
     const headerNames = rows[0].map(h => h.trim().toLowerCase());
     let ratingIndex = -1;
     headerNames.forEach((name, idx) => {
-      if (name.includes("overall rating") && ratingIndex === -1) {
+      if (name.includes("rating") && ratingIndex === -1) {
         ratingIndex = idx;
       }
     });
-
-    // Fallback: if no explicit "overall rating", use first "rating" column
-    if (ratingIndex === -1) {
-      headerNames.forEach((name, idx) => {
-        if (name.includes("rating") && ratingIndex === -1) {
-          ratingIndex = idx;
-        }
-      });
-    }
 
     // Data rows
     for (let i = 1; i < rows.length; i++) {
@@ -1329,7 +1425,6 @@
   function updateOverviewCard(monitorRows, evalRows) {
     if (!monitorRows || !monitorRows.length) return;
 
-    // --- Monitoring side (existing) ---
     const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
@@ -1378,34 +1473,6 @@
     setText('ov-total-evaluation', totalEvaluation);
     setText('ov-total-beneficiaries', totalBeneficiaries);
     setText('ov-overall-score', overallScore);
-
-    // --- NEW: Evaluation KPIs ---
-    let avgOutcome = 0;
-    let avgImpact = 0;
-    let avgOverall = 0;
-
-    if (evalRows && evalRows.length > 1) {
-      const eHeader = evalRows[0];
-      const eHeadersLower = eHeader.map(h => h.trim().toLowerCase());
-
-      const hasOutcome = eHeadersLower.indexOf('outcome rating') !== -1;
-      const hasImpact  = eHeadersLower.indexOf('impact rating') !== -1;
-      const hasOverall = eHeadersLower.indexOf('overall rating') !== -1;
-
-      if (hasOutcome) {
-        avgOutcome = averageFieldFromRows(evalRows, eHeader, 'outcome rating');
-      }
-      if (hasImpact) {
-        avgImpact = averageFieldFromRows(evalRows, eHeader, 'impact rating');
-      }
-      if (hasOverall) {
-        avgOverall = averageFieldFromRows(evalRows, eHeader, 'overall rating');
-      }
-    }
-
-    setText('ov-avg-outcome', avgOutcome ? avgOutcome.toFixed(1) : '0');
-    setText('ov-avg-impact', avgImpact ? avgImpact.toFixed(1) : '0');
-    setText('ov-avg-overall', avgOverall ? avgOverall.toFixed(1) : '0');
   }
 
   // ===== LEARNING CARD =====
@@ -1478,10 +1545,9 @@
   }
 
   // ===== CHARTS =====
-  function updateCharts(monitorRows, evalRows) {
+  function updateCharts(monitorRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
-    const ctx3 = document.getElementById('chart-eval-ratings');
 
     if (!monitorRows || !monitorRows.length || !ctx1 || !ctx2) return;
 
@@ -1496,7 +1562,7 @@
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxBenef  = headersLower.indexOf('number of beneficiaries reached this period.');
 
-    // Chart 1: Average ratings (Monitoring)
+    // Chart 1: Average ratings
     const avgActivity = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule') : 0;
     const avgBudget   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned') : 0;
     const avgStaff    = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'staff availability') : 0;
@@ -1527,7 +1593,7 @@
       }
     });
 
-    // Chart 2: Beneficiaries by period (Monitoring)
+    // Chart 2: Beneficiaries by period
     const periodMap = new Map();
     const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
@@ -1563,65 +1629,6 @@
         }
       }
     });
-
-    // Chart 3: Evaluation Ratings (Outcome, Impact, Overall)
-    if (!ctx3 || !evalRows || evalRows.length <= 1) {
-      if (evalRatingsChart) {
-        evalRatingsChart.destroy();
-        evalRatingsChart = null;
-      }
-      return;
-    }
-
-    const eHeader = evalRows[0];
-    const eHeadersLower = eHeader.map(h => h.trim().toLowerCase());
-
-    const hasOutcome = eHeadersLower.indexOf('outcome rating') !== -1;
-    const hasImpact  = eHeadersLower.indexOf('impact rating') !== -1;
-    const hasOverall = eHeadersLower.indexOf('overall rating') !== -1;
-
-    const avgOutcome = hasOutcome ? averageFieldFromRows(evalRows, eHeader, 'outcome rating') : 0;
-    const avgImpact  = hasImpact  ? averageFieldFromRows(evalRows, eHeader, 'impact rating') : 0;
-    const avgOverall = hasOverall ? averageFieldFromRows(evalRows, eHeader, 'overall rating') : 0;
-
-    const evalLabels = [];
-    const evalData = [];
-
-    if (hasOutcome) {
-      evalLabels.push('Outcome');
-      evalData.push(avgOutcome);
-    }
-    if (hasImpact) {
-      evalLabels.push('Impact');
-      evalData.push(avgImpact);
-    }
-    if (hasOverall) {
-      evalLabels.push('Overall');
-      evalData.push(avgOverall);
-    }
-
-    if (evalRatingsChart) evalRatingsChart.destroy();
-    if (evalLabels.length) {
-      evalRatingsChart = new Chart(ctx3, {
-        type: 'bar',
-        data: {
-          labels: evalLabels,
-          datasets: [{
-            label: 'Average Evaluation Rating (1–5)',
-            data: evalData
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              suggestedMax: 5
-            }
-          }
-        }
-      });
-    }
   }
 
   // ===== PDF REPORT =====
@@ -1638,9 +1645,6 @@
       const evl = document.getElementById('ov-total-evaluation')?.textContent || '0';
       const ben = document.getElementById('ov-total-beneficiaries')?.textContent || '0';
       const score = document.getElementById('ov-overall-score')?.textContent || '0';
-      const outc = document.getElementById('ov-avg-outcome')?.textContent || '0';
-      const imp  = document.getElementById('ov-avg-impact')?.textContent || '0';
-      const ovl  = document.getElementById('ov-avg-overall')?.textContent || '0';
 
       const doc = new jsPDF();
 
@@ -1655,11 +1659,7 @@
       doc.text('Total Beneficiaries Reached: ' + ben, 10, 48);
       doc.text('Overall Performance Score (Activity & Budget): ' + score, 10, 54);
 
-      doc.text('Average Outcome Rating: ' + outc, 10, 62);
-      doc.text('Average Impact Rating: ' + imp, 10, 68);
-      doc.text('Average Overall Evaluation Rating: ' + ovl, 10, 74);
-
-      doc.text('Generated by ProMEL Analytics Solutions', 10, 90);
+      doc.text('Generated by ProMEL Analytics Solutions', 10, 70);
 
       doc.save('ProMEL_PMEL_Report.pdf');
     } catch (e) {
@@ -1685,6 +1685,91 @@
         e.preventDefault();
         alert('Evaluation entry captured in the browser.\n\nTo send this to Google Sheets, connect this form to a Google Apps Script Web App endpoint.');
       });
+    }
+  }
+
+  // ===== AI ASSISTANT (OPENAI) FRONTEND HOOK =====
+  async function sendToAIAssistant() {
+    const modeEl = document.getElementById('ai-mode');
+    const promptEl = document.getElementById('ai-prompt');
+    const includeFiltersEl = document.getElementById('ai-include-filters');
+    const statusEl = document.getElementById('ai-status');
+    const responseBox = document.getElementById('ai-response-box');
+
+    const mode = modeEl ? modeEl.value : 'custom';
+    const prompt = (promptEl ? promptEl.value : '').trim();
+    const includeFilters = includeFiltersEl ? includeFiltersEl.checked : true;
+
+    if (!prompt) {
+      alert('Please enter a prompt or question for the AI assistant.');
+      return;
+    }
+
+    // Basic context from filters
+    const project = document.getElementById('filter-project')?.value || '';
+    const period = document.getElementById('filter-period')?.value || '';
+    const location = document.getElementById('filter-location')?.value || '';
+
+    // KPI snapshot from DOM
+    const kpis = {
+      totalProjects: document.getElementById('ov-total-projects')?.textContent || '0',
+      totalMonitoring: document.getElementById('ov-total-monitoring')?.textContent || '0',
+      totalEvaluation: document.getElementById('ov-total-evaluation')?.textContent || '0',
+      totalBeneficiaries: document.getElementById('ov-total-beneficiaries')?.textContent || '0',
+      overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
+    };
+
+    const payload = {
+      mode,
+      user_prompt: prompt,
+      include_filters: includeFilters,
+      filters: {
+        project,
+        period,
+        location
+      },
+      kpi_snapshot: kpis
+    };
+
+    statusEl.textContent = 'Sending request to backend AI service...';
+    responseBox.textContent = '';
+
+    try {
+      const res = await fetch(AI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error('HTTP ' + res.status + ' from AI backend');
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+      let textReply = '';
+
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        // Expect either { reply: "..."} or generic JSON
+        if (typeof data === 'string') {
+          textReply = data;
+        } else if (data.reply) {
+          textReply = data.reply;
+        } else {
+          textReply = JSON.stringify(data, null, 2);
+        }
+      } else {
+        textReply = await res.text();
+      }
+
+      responseBox.textContent = textReply || '(No text returned from AI backend.)';
+      statusEl.textContent = 'AI response received.';
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'Error contacting AI backend: ' + err.message;
+      responseBox.textContent = '';
     }
   }
 </script>

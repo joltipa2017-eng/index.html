@@ -927,8 +927,8 @@
   }
 
   function loadEvaluationTable() {
-    // TODO: replace this URL with your real Evaluation Google Sheets CSV link
-    const csvUrl = "https://docs.google.com/spreadsheets/d/YOUR_EVALUATION_SHEET_ID/export?format=csv&gid=YOUR_EVALUATION_GID";
+    // Real Evaluation Google Sheets CSV link
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd_zFcgy_c_5JDgK9wTVFLi5WeHTPF4uQBq9cOPl8vurc2DVu3DWrqwXiE1FmGcL5f2TtWjWLlGs1L/pub?gid=1608876672&single=true&output=csv";
 
     fetch(csvUrl)
       .then(response => {
@@ -1054,7 +1054,7 @@
     const locSel = document.getElementById('filter-location');
 
     const project = projSel ? projSel.value : "";
-    const period = periodSel ? periodSel.value : "";
+       const period = periodSel ? periodSel.value : "";
     const location = locSel ? locSel.value : "";
 
     monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);

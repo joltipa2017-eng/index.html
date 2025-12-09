@@ -525,6 +525,20 @@
           <div class="kpi-label">Overall Performance Score (Activity &amp; Budget)</div>
           <div class="kpi-value" id="ov-overall-score">0</div>
         </div>
+
+        <!-- NEW EVALUATION KPI BOXES -->
+        <div class="kpi-box">
+          <div class="kpi-label">Avg Outcome Rating (1–5)</div>
+          <div class="kpi-value" id="ov-avg-outcome">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Avg Impact Rating (1–5)</div>
+          <div class="kpi-value" id="ov-avg-impact">0</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Avg Overall Evaluation Rating (1–5)</div>
+          <div class="kpi-value" id="ov-avg-overall">0</div>
+        </div>
       </div>
 
       <div class="table-wrapper" style="margin-top:12px;">
@@ -533,6 +547,11 @@
 
       <div class="table-wrapper" style="margin-top:12px;">
         <canvas id="chart-beneficiaries"></canvas>
+      </div>
+
+      <!-- NEW EVALUATION CHART -->
+      <div class="table-wrapper" style="margin-top:12px;">
+        <canvas id="chart-eval-ratings"></canvas>
       </div>
 
       <button class="close-btn" onclick="closeSection('overview')">Close</button>
@@ -781,6 +800,7 @@
 
   let avgRatingsChart = null;
   let beneficiariesChart = null;
+  let evalRatingsChart = null;
 
   // ============================
   // EXPECTED CSV HEADERS (LOWERCASE)
@@ -1054,7 +1074,7 @@
     const locSel = document.getElementById('filter-location');
 
     const project = projSel ? projSel.value : "";
-       const period = periodSel ? periodSel.value : "";
+    const period = periodSel ? periodSel.value : "";
     const location = locSel ? locSel.value : "";
 
     monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);
@@ -1069,7 +1089,7 @@
     updateOverviewCard(monitorForView, evalForView);
     updateLearningCard(monitorForView);
     updateReportsCard(monitorForView);
-    updateCharts(monitorForView);
+    updateCharts(monitorForView, evalForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
@@ -1227,14 +1247,23 @@
     });
     thead.appendChild(headerRow);
 
-    // Find rating column (header contains 'rating')
+    // Find rating column (header contains 'rating') – keep generic for now
     const headerNames = rows[0].map(h => h.trim().toLowerCase());
     let ratingIndex = -1;
     headerNames.forEach((name, idx) => {
-      if (name.includes("rating") && ratingIndex === -1) {
+      if (name.includes("overall rating") && ratingIndex === -1) {
         ratingIndex = idx;
       }
     });
+
+    // Fallback: if no explicit "overall rating", use first "rating" column
+    if (ratingIndex === -1) {
+      headerNames.forEach((name, idx) => {
+        if (name.includes("rating") && ratingIndex === -1) {
+          ratingIndex = idx;
+        }
+      });
+    }
 
     // Data rows
     for (let i = 1; i < rows.length; i++) {
@@ -1300,6 +1329,7 @@
   function updateOverviewCard(monitorRows, evalRows) {
     if (!monitorRows || !monitorRows.length) return;
 
+    // --- Monitoring side (existing) ---
     const headerRow = monitorRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
@@ -1348,6 +1378,34 @@
     setText('ov-total-evaluation', totalEvaluation);
     setText('ov-total-beneficiaries', totalBeneficiaries);
     setText('ov-overall-score', overallScore);
+
+    // --- NEW: Evaluation KPIs ---
+    let avgOutcome = 0;
+    let avgImpact = 0;
+    let avgOverall = 0;
+
+    if (evalRows && evalRows.length > 1) {
+      const eHeader = evalRows[0];
+      const eHeadersLower = eHeader.map(h => h.trim().toLowerCase());
+
+      const hasOutcome = eHeadersLower.indexOf('outcome rating') !== -1;
+      const hasImpact  = eHeadersLower.indexOf('impact rating') !== -1;
+      const hasOverall = eHeadersLower.indexOf('overall rating') !== -1;
+
+      if (hasOutcome) {
+        avgOutcome = averageFieldFromRows(evalRows, eHeader, 'outcome rating');
+      }
+      if (hasImpact) {
+        avgImpact = averageFieldFromRows(evalRows, eHeader, 'impact rating');
+      }
+      if (hasOverall) {
+        avgOverall = averageFieldFromRows(evalRows, eHeader, 'overall rating');
+      }
+    }
+
+    setText('ov-avg-outcome', avgOutcome ? avgOutcome.toFixed(1) : '0');
+    setText('ov-avg-impact', avgImpact ? avgImpact.toFixed(1) : '0');
+    setText('ov-avg-overall', avgOverall ? avgOverall.toFixed(1) : '0');
   }
 
   // ===== LEARNING CARD =====
@@ -1420,9 +1478,10 @@
   }
 
   // ===== CHARTS =====
-  function updateCharts(monitorRows) {
+  function updateCharts(monitorRows, evalRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
+    const ctx3 = document.getElementById('chart-eval-ratings');
 
     if (!monitorRows || !monitorRows.length || !ctx1 || !ctx2) return;
 
@@ -1437,7 +1496,7 @@
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxBenef  = headersLower.indexOf('number of beneficiaries reached this period.');
 
-    // Chart 1: Average ratings
+    // Chart 1: Average ratings (Monitoring)
     const avgActivity = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule') : 0;
     const avgBudget   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned') : 0;
     const avgStaff    = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'staff availability') : 0;
@@ -1468,7 +1527,7 @@
       }
     });
 
-    // Chart 2: Beneficiaries by period
+    // Chart 2: Beneficiaries by period (Monitoring)
     const periodMap = new Map();
     const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
@@ -1504,6 +1563,65 @@
         }
       }
     });
+
+    // Chart 3: Evaluation Ratings (Outcome, Impact, Overall)
+    if (!ctx3 || !evalRows || evalRows.length <= 1) {
+      if (evalRatingsChart) {
+        evalRatingsChart.destroy();
+        evalRatingsChart = null;
+      }
+      return;
+    }
+
+    const eHeader = evalRows[0];
+    const eHeadersLower = eHeader.map(h => h.trim().toLowerCase());
+
+    const hasOutcome = eHeadersLower.indexOf('outcome rating') !== -1;
+    const hasImpact  = eHeadersLower.indexOf('impact rating') !== -1;
+    const hasOverall = eHeadersLower.indexOf('overall rating') !== -1;
+
+    const avgOutcome = hasOutcome ? averageFieldFromRows(evalRows, eHeader, 'outcome rating') : 0;
+    const avgImpact  = hasImpact  ? averageFieldFromRows(evalRows, eHeader, 'impact rating') : 0;
+    const avgOverall = hasOverall ? averageFieldFromRows(evalRows, eHeader, 'overall rating') : 0;
+
+    const evalLabels = [];
+    const evalData = [];
+
+    if (hasOutcome) {
+      evalLabels.push('Outcome');
+      evalData.push(avgOutcome);
+    }
+    if (hasImpact) {
+      evalLabels.push('Impact');
+      evalData.push(avgImpact);
+    }
+    if (hasOverall) {
+      evalLabels.push('Overall');
+      evalData.push(avgOverall);
+    }
+
+    if (evalRatingsChart) evalRatingsChart.destroy();
+    if (evalLabels.length) {
+      evalRatingsChart = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: evalLabels,
+          datasets: [{
+            label: 'Average Evaluation Rating (1–5)',
+            data: evalData
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: 5
+            }
+          }
+        }
+      });
+    }
   }
 
   // ===== PDF REPORT =====
@@ -1520,6 +1638,9 @@
       const evl = document.getElementById('ov-total-evaluation')?.textContent || '0';
       const ben = document.getElementById('ov-total-beneficiaries')?.textContent || '0';
       const score = document.getElementById('ov-overall-score')?.textContent || '0';
+      const outc = document.getElementById('ov-avg-outcome')?.textContent || '0';
+      const imp  = document.getElementById('ov-avg-impact')?.textContent || '0';
+      const ovl  = document.getElementById('ov-avg-overall')?.textContent || '0';
 
       const doc = new jsPDF();
 
@@ -1534,7 +1655,11 @@
       doc.text('Total Beneficiaries Reached: ' + ben, 10, 48);
       doc.text('Overall Performance Score (Activity & Budget): ' + score, 10, 54);
 
-      doc.text('Generated by ProMEL Analytics Solutions', 10, 70);
+      doc.text('Average Outcome Rating: ' + outc, 10, 62);
+      doc.text('Average Impact Rating: ' + imp, 10, 68);
+      doc.text('Average Overall Evaluation Rating: ' + ovl, 10, 74);
+
+      doc.text('Generated by ProMEL Analytics Solutions', 10, 90);
 
       doc.save('ProMEL_PMEL_Report.pdf');
     } catch (e) {

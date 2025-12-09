@@ -868,7 +868,7 @@
       <p>
         Use this assistant to interpret Monitoring &amp; Evaluation data, explain trends, and draft
         narrative reports for donors or management. It sends your prompt and selected dashboard context
-        to a secure backend API which then talks to OpenAI.
+        to a backend API (test endpoint for now).
       </p>
 
       <div class="ai-chat-container">
@@ -927,13 +927,9 @@
   // ===========================
   // CONFIG: BACKEND AI ENDPOINT
   // ===========================
-  // IMPORTANT:
-  // 1. Do NOT call OpenAI directly from this HTML. Your API key must stay secret.
-  // 2. Deploy a secure backend (e.g. on Render, Railway, Cloudflare Workers, etc.)
-  // 3. That backend should receive JSON from this page, call OpenAI, and return a reply.
-  //
-  // Replace the URL below with your real backend endpoint:
-  const AI_API_URL = "https://your-server.example.com/api/pas-ai-chat";
+  // For now, this uses httpbin.org as a test echo service.
+  // It will return the JSON you send, so you can confirm the wiring works.
+  const AI_API_URL = "https://httpbin.org/post";
 
   // Global data arrays (include header row)
   let monitoringRows = [];
@@ -1731,7 +1727,7 @@
       kpi_snapshot: kpis
     };
 
-    statusEl.textContent = 'Sending request to backend AI service...';
+    statusEl.textContent = 'Sending request to backend AI service (test endpoint)...';
     responseBox.textContent = '';
 
     try {
@@ -1752,20 +1748,13 @@
 
       if (contentType.includes('application/json')) {
         const data = await res.json();
-        // Expect either { reply: "..."} or generic JSON
-        if (typeof data === 'string') {
-          textReply = data;
-        } else if (data.reply) {
-          textReply = data.reply;
-        } else {
-          textReply = JSON.stringify(data, null, 2);
-        }
+        textReply = JSON.stringify(data, null, 2);
       } else {
         textReply = await res.text();
       }
 
       responseBox.textContent = textReply || '(No text returned from AI backend.)';
-      statusEl.textContent = 'AI response received.';
+      statusEl.textContent = 'AI (test) response received.';
     } catch (err) {
       console.error(err);
       statusEl.textContent = 'Error contacting AI backend: ' + err.message;

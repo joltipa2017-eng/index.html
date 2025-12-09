@@ -867,8 +867,8 @@
       <h2>AI Assistant (OpenAI) – ProMEL Reasoning &amp; Reports</h2>
       <p>
         Use this assistant to interpret Monitoring &amp; Evaluation data, explain trends, and draft
-        narrative reports for donors or management. It sends your prompt and selected dashboard context
-        to a backend API (test endpoint for now).
+        narrative reports for donors or management. In this demo version, the reasoning is generated
+        entirely inside the dashboard (no external network call).
       </p>
 
       <div class="ai-chat-container">
@@ -878,9 +878,9 @@
 
           <label for="ai-mode">Analysis focus</label>
           <select id="ai-mode">
-            <option value="explain_trends">Explain current trends & risks</option>
-            <option value="draft_report">Draft narrative report (Monitoring & Evaluation)</option>
-            <option value="learning_summary">Summarise key lessons & recommendations</option>
+            <option value="explain_trends">Explain current trends &amp; risks</option>
+            <option value="draft_report">Draft narrative report (Monitoring &amp; Evaluation)</option>
+            <option value="learning_summary">Summarise key lessons &amp; recommendations</option>
             <option value="design_questions">Design MEL questions / indicators</option>
             <option value="custom">Custom analysis</option>
           </select>
@@ -888,12 +888,12 @@
           <label for="ai-prompt">Prompt / question</label>
           <textarea
             id="ai-prompt"
-            placeholder="e.g. Explain the current status of the Function and Expenditure Review project based on the latest Monitoring & Evaluation data and highlight any critical risks."
+            placeholder="e.g. Explain the current status of the Function and Expenditure Review project based on the latest Monitoring &amp; Evaluation data and highlight any critical risks."
           ></textarea>
 
           <div class="ai-inline-checkbox">
             <input type="checkbox" id="ai-include-filters" checked>
-            <label for="ai-include-filters">Include current filters & KPI summary in analysis</label>
+            <label for="ai-include-filters">Include current filters &amp; KPI summary in analysis</label>
           </div>
 
           <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI</button>
@@ -904,7 +904,7 @@
         <div class="ai-output-panel">
           <h3>AI Response</h3>
           <div id="ai-response-box">
-            <!-- AI answer from backend will appear here -->
+            <!-- AI-style answer will appear here -->
           </div>
         </div>
       </div>
@@ -926,9 +926,8 @@
 <script>
   // ===========================
   // CONFIG: BACKEND AI ENDPOINT
+  // (not used in demo mode, but kept for future real backend)
   // ===========================
-  // For now, this uses httpbin.org as a test echo service.
-  // It will return the JSON you send, so you can confirm the wiring works.
   const AI_API_URL = "https://httpbin.org/post";
 
   // Global data arrays (include header row)
@@ -1127,7 +1126,7 @@
     const currentLoc = locSel.value;
 
     const projects = new Set();
-    const periods = new Set();
+    the periods = new Set();
     const locations = new Set();
 
     const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
@@ -1684,7 +1683,7 @@
     }
   }
 
-  // ===== AI ASSISTANT (OPENAI) FRONTEND HOOK =====
+  // ===== AI ASSISTANT (OPENAI) FRONTEND HOOK – DEMO MODE (NO NETWORK) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
     const promptEl = document.getElementById('ai-prompt');
@@ -1702,9 +1701,9 @@
     }
 
     // Basic context from filters
-    const project = document.getElementById('filter-project')?.value || '';
-    const period = document.getElementById('filter-period')?.value || '';
-    const location = document.getElementById('filter-location')?.value || '';
+    const project = document.getElementById('filter-project')?.value || 'All projects';
+    const period = document.getElementById('filter-period')?.value || 'All periods';
+    const location = document.getElementById('filter-location')?.value || 'All locations';
 
     // KPI snapshot from DOM
     const kpis = {
@@ -1715,51 +1714,61 @@
       overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
     };
 
-    const payload = {
-      mode,
-      user_prompt: prompt,
-      include_filters: includeFilters,
-      filters: {
-        project,
-        period,
-        location
-      },
-      kpi_snapshot: kpis
-    };
-
-    statusEl.textContent = 'Sending request to backend AI service (test endpoint)...';
+    statusEl.textContent = 'Generating AI-style response in demo mode (no network)...';
     responseBox.textContent = '';
 
-    try {
-      const res = await fetch(AI_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+    // Simulate a short “thinking” delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (!res.ok) {
-        throw new Error('HTTP ' + res.status + ' from AI backend');
-      }
-
-      const contentType = res.headers.get('content-type') || '';
-      let textReply = '';
-
-      if (contentType.includes('application/json')) {
-        const data = await res.json();
-        textReply = JSON.stringify(data, null, 2);
-      } else {
-        textReply = await res.text();
-      }
-
-      responseBox.textContent = textReply || '(No text returned from AI backend.)';
-      statusEl.textContent = 'AI (test) response received.';
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = 'Error contacting AI backend: ' + err.message;
-      responseBox.textContent = '';
+    // Pick heading based on mode
+    let heading = '';
+    if (mode === 'explain_trends') {
+      heading = 'Analysis of Current Trends & Risks';
+    } else if (mode === 'draft_report') {
+      heading = 'Draft Narrative Monitoring & Evaluation Summary';
+    } else if (mode === 'learning_summary') {
+      heading = 'Key Lessons Learned & Recommendations';
+    } else if (mode === 'design_questions') {
+      heading = 'Suggested MEL Questions & Indicators';
+    } else {
+      heading = 'Custom Analysis';
     }
+
+    const contextBlock = includeFilters ? `
+Context based on current dashboard filters:
+- Project: ${project}
+- Reporting Period: ${period}
+- Location: ${location}
+
+KPI snapshot:
+- Total Projects: ${kpis.totalProjects}
+- Monitoring Records: ${kpis.totalMonitoring}
+- Evaluation Records: ${kpis.totalEvaluation}
+- Beneficiaries Reached: ${kpis.totalBeneficiaries}
+- Overall Performance Score: ${kpis.overallScore}
+` : '';
+
+    const reply = `${heading}
+
+User request:
+${prompt}
+
+${contextBlock}
+High-level AI-style insight (demo only):
+1. Overall performance appears to be driven by activity implementation and budget utilisation. Where the overall score is below 3.5, you may need to review activity planning, resource allocation, and partner coordination.
+2. Pay close attention to locations or periods with lower ratings (1–2) on activity schedule and budget utilisation, as these indicate off-track implementation or weak financial control.
+3. Use the learning card to capture specific achievements, challenges, and immediate actions. These can then be translated into targeted management responses and follow-up support.
+4. For donor or management reporting, highlight both quantitative results (beneficiaries reached, number of reports, performance score) and qualitative lessons (what worked well, what did not, and how management will respond).
+
+Note:
+This is DEMO MODE inside the dashboard. To use real OpenAI responses, you will need to:
+- Deploy a secure backend API (e.g. on Render / Railway / Cloudflare Workers).
+- Move your OpenAI API key to that backend.
+- Point AI_API_URL to your live backend endpoint.
+`;
+
+    responseBox.textContent = reply;
+    statusEl.textContent = 'Demo AI response generated successfully (no network required).';
   }
 </script>
 

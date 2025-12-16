@@ -1006,6 +1006,9 @@
     setupFilterListeners();
     setupDataEntryForms();
     setupAutoRefresh();
+
+    // ✅ ADDED: bind Monitoring "Group by" once at init (safe, idempotent)
+    setupMonGroupByListener();
   }
 
   function setupAutoRefresh() {
@@ -1015,12 +1018,57 @@
     }, 60000);
   }
 
+  // ✅ UPDATED: openSection now refreshes charts/KPIs when the section becomes visible.
+  // This fixes "Monitoring & Control" showing blank charts when canvases were created while hidden.
   function openSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     const el = document.getElementById(id);
     if (el) {
       el.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      setTimeout(() => {
+        try {
+          if (id === "monitoring") {
+            const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+            updateMonitoringKPIs(monitorForView);
+            updateMonitoringSummaryCharts(monitorForView);
+            // In case Overview charts are embedded/used
+            updateCharts(monitorForView);
+          }
+
+          if (id === "evaluation") {
+            const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
+            updateEvaluationKPIs(evalForView);
+            updateEvaluationCharts(evalForView);
+          }
+
+          if (id === "overview") {
+            const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+            const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
+            updateOverviewCard(monitorForView, evalForView);
+            updateOverviewKPIs(monitorForView, evalForView);
+            updateCharts(monitorForView);
+          }
+
+          // Force Chart.js resize/update for any existing charts
+          const charts = [
+            avgRatingsChart, beneficiariesChart,
+            monOverallByGroupChart, monBenefByGroupChart,
+            evalRatingsChart,
+            monKpiBarChart, monKpiDonutChart,
+            evalKpiBarChart, evalKpiDonutChart,
+            ovKpiBarChart, ovKpiDonutChart
+          ];
+
+          charts.forEach(ch => {
+            if (ch && typeof ch.resize === "function") ch.resize();
+            if (ch && typeof ch.update === "function") ch.update();
+          });
+        } catch (e) {
+          console.error("Chart refresh error:", e);
+        }
+      }, 120);
     }
   }
 

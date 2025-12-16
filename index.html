@@ -442,6 +442,15 @@
     <!-- Filters -->
     <div id="filters-bar" class="filters-bar">
       <strong>Filters:</strong>
+
+      <!-- ✅ NEW: Organization filter (before Project) -->
+      <label>
+        Organization:
+        <select id="filter-org">
+          <option value="">All</option>
+        </select>
+      </label>
+
       <label>
         Project:
         <select id="filter-project">
@@ -1135,12 +1144,14 @@
   function setupFilterListeners() {
     if (filtersInitialized) return;
 
+    const orgSel = document.getElementById('filter-org');     // ✅ NEW
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
     function onChange() { applyFilters(); }
 
+    if (orgSel) orgSel.addEventListener('change', onChange);  // ✅ NEW
     if (projSel) projSel.addEventListener('change', onChange);
     if (periodSel) periodSel.addEventListener('change', onChange);
     if (locSel) locSel.addEventListener('change', onChange);
@@ -1154,19 +1165,23 @@
     const headerRow = monitoringRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
+    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ NEW
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
+    const orgSel = document.getElementById('filter-org');      // ✅ NEW
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
-    if (!projSel || !periodSel || !locSel) return;
+    if (!orgSel || !projSel || !periodSel || !locSel) return;  // ✅ UPDATED
 
+    const currentOrg = orgSel.value;                           // ✅ NEW
     const currentProj = projSel.value;
     const currentPeriod = periodSel.value;
     const currentLoc = locSel.value;
 
+    const orgs = new Set();                                    // ✅ NEW
     const projects = new Set();
     const periods = new Set();
     const locations = new Set();
@@ -1174,6 +1189,7 @@
     const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
     dataRows.forEach(row => {
+      if (idxOrg !== -1 && row[idxOrg]) orgs.add(row[idxOrg].trim());          // ✅ NEW
       if (idxProject !== -1 && row[idxProject]) projects.add(row[idxProject].trim());
       if (idxPeriod !== -1 && row[idxPeriod]) periods.add(row[idxPeriod].trim());
       if (idxLocation !== -1 && row[idxLocation]) locations.add(row[idxLocation].trim());
@@ -1196,21 +1212,24 @@
       else select.value = "";
     }
 
+    refillSelect(orgSel, orgs, currentOrg);                     // ✅ NEW
     refillSelect(projSel, projects, currentProj);
     refillSelect(periodSel, periods, currentPeriod);
     refillSelect(locSel, locations, currentLoc);
   }
 
   function applyFilters() {
+    const orgSel = document.getElementById('filter-org');       // ✅ NEW
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
+    const org = orgSel ? orgSel.value : "";                     // ✅ NEW
     const project = projSel ? projSel.value : "";
     const period = periodSel ? periodSel.value : "";
     const location = locSel ? locSel.value : "";
 
-    monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);
+    monitoringFilteredRows = filterMonitoringRows(monitoringRows, org, project, period, location); // ✅ UPDATED
     evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
 
     const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
@@ -1234,26 +1253,30 @@
     updateOverviewKPIs(monitorForView, evalForView);
   }
 
-  function filterMonitoringRows(allRows, project, period, location) {
+  function filterMonitoringRows(allRows, org, project, period, location) {     // ✅ UPDATED
     if (!allRows.length || allRows.length <= 1) return [];
 
     const headerRow = allRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
+    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ NEW
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
     const filteredDataRows = allRows.slice(1).filter(row => {
       if (row.every(c => c.trim() === "")) return false;
+
+      const o = idxOrg !== -1 ? (row[idxOrg] || '').trim() : '';               // ✅ NEW
       const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
       const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
       const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
 
+      const matchOrg = org ? o === org : true;                                 // ✅ NEW
       const matchProj = project ? p === project : true;
       const matchPer = period ? per === period : true;
       const matchLoc = location ? loc === location : true;
-      return matchProj && matchPer && matchLoc;
+      return matchOrg && matchProj && matchPer && matchLoc;                    // ✅ UPDATED
     });
 
     if (!filteredDataRows.length) return [];
@@ -2221,28 +2244,23 @@
       });
     }
 
-    // --- Combined Project Performance %
-    // Use average of (Monitoring Overall, Evaluation Performance) if both exist; else whichever exists.
     const comboParts = [];
     if (monOverallPct > 0) comboParts.push(monOverallPct);
     if (evPerfPct > 0) comboParts.push(evPerfPct);
     const combinedPct = comboParts.length ? Math.round(comboParts.reduce((a, x) => a + x, 0) / comboParts.length) : 0;
 
-    // Update KPI texts
     setText("ov-kpi-monitoring", monOverallPct + "%");
     setText("ov-kpi-evalperf", evPerfPct + "%");
     setText("ov-kpi-outcome", evOutcomePct + "%");
     setText("ov-kpi-impact", evImpactPct + "%");
     setText("ov-kpi-combined", combinedPct + "%");
 
-    // Apply status styling
     applyKpiStatus("ov-kpi-monitoring-box", "ov-kpi-monitoring", monOverallPct);
     applyKpiStatus("ov-kpi-evalperf-box", "ov-kpi-evalperf", evPerfPct);
     applyKpiStatus("ov-kpi-outcome-box", "ov-kpi-outcome", evOutcomePct);
     applyKpiStatus("ov-kpi-impact-box", "ov-kpi-impact", evImpactPct);
     applyKpiStatus("ov-kpi-combined-box", "ov-kpi-combined", combinedPct);
 
-    // Bar chart
     const barLabels = ["Monitoring", "Evaluation", "Outcome", "Impact", "Combined"];
     const barData = [monOverallPct, evPerfPct, evOutcomePct, evImpactPct, combinedPct];
     const barColors = barData.map(p => chartColorForPercent(p));
@@ -2264,7 +2282,6 @@
       }
     });
 
-    // Doughnut chart (combined distribution counts)
     const totalBad = monBad + evBad;
     const totalWarn = monWarn + evWarn;
     const totalGood = monGood + evGood;
@@ -2355,6 +2372,7 @@
 
     if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
 
+    const org = document.getElementById('filter-org')?.value || '';           // ✅ NEW
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
@@ -2371,7 +2389,7 @@
       mode,
       user_prompt: prompt,
       include_filters: includeFilters,
-      filters: { project, period, location },
+      filters: { org, project, period, location },                           // ✅ UPDATED
       kpi_snapshot: kpis
     };
 

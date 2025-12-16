@@ -469,6 +469,11 @@
           <option value="">All</option>
         </select>
       </label>
+
+      <!-- ✅ NEW: Data load status line -->
+      <span id="data-status" class="info-note" style="margin-left:auto;">
+        Data status: not loaded yet.
+      </span>
     </div>
 
     <!-- Navigation cards -->
@@ -964,6 +969,23 @@
   let ovKpiDonutChart = null;
 
   // ===========================
+  // ✅ NEW: DATA STATUS + CSV SANITY CHECK
+  // ===========================
+  function setStatus(msg) {
+    const el = document.getElementById("data-status");
+    if (el) el.textContent = msg;
+  }
+
+  function looksLikeHtmlNotCsv(text) {
+    const t = (text || "").trim();
+    if (!t) return true;
+    if (t.startsWith("<!DOCTYPE html") || t.startsWith("<html")) return true;
+    if (t.toLowerCase().includes("google sheets") && t.toLowerCase().includes("cookies")) return true;
+    if (t.toLowerCase().includes("sign in") && t.toLowerCase().includes("accounts.google.com")) return true;
+    return false;
+  }
+
+  // ===========================
   // LOGIN & INIT
   // ===========================
   document.addEventListener('DOMContentLoaded', function () {
@@ -1001,14 +1023,18 @@
   });
 
   function initApp() {
+    setStatus("Loading Monitoring + Evaluation data...");
     loadMonitoringTable();
     loadEvaluationTable();
     setupFilterListeners();
     setupDataEntryForms();
     setupAutoRefresh();
 
-    // ✅ ADDED: bind Monitoring "Group by" once at init (safe, idempotent)
+    // ✅ bind Monitoring "Group by" once at init (safe, idempotent)
     setupMonGroupByListener();
+
+    // ✅ NEW: show something immediately after login
+    openSection("overview");
   }
 
   function setupAutoRefresh() {
@@ -1019,7 +1045,6 @@
   }
 
   // ✅ UPDATED: openSection now refreshes charts/KPIs when the section becomes visible.
-  // This fixes "Monitoring & Control" showing blank charts when canvases were created while hidden.
   function openSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     const el = document.getElementById(id);
@@ -1033,7 +1058,6 @@
             const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
             updateMonitoringKPIs(monitorForView);
             updateMonitoringSummaryCharts(monitorForView);
-            // In case Overview charts are embedded/used
             updateCharts(monitorForView);
           }
 
@@ -1051,7 +1075,6 @@
             updateCharts(monitorForView);
           }
 
-          // Force Chart.js resize/update for any existing charts
           const charts = [
             avgRatingsChart, beneficiariesChart,
             monOverallByGroupChart, monBenefByGroupChart,
@@ -1081,27 +1104,40 @@
   function loadMonitoringTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?gid=1298321526&single=true&output=csv";
 
-    fetch(csvUrl)
+    setStatus("Loading Monitoring CSV...");
+
+    fetch(csvUrl, { cache: "no-store" })
       .then(response => {
-        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
+        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching Monitoring CSV");
         return response.text();
       })
       .then(text => {
+        if (looksLikeHtmlNotCsv(text)) {
+          throw new Error(
+            "Monitoring link is NOT returning CSV. It looks like an HTML consent/access page. " +
+            "Fix: In Google Sheets -> File -> Share -> Publish to the web -> CSV, then use that published CSV link."
+          );
+        }
+
         const rows = parseCSV(text);
-        if (!rows || rows.length === 0) throw new Error("Monitoring CSV file is empty or could not be parsed.");
+        if (!rows || rows.length <= 1) throw new Error("Monitoring CSV parsed but has no data rows.");
 
         monitoringRows = rows;
         buildMonitoringFilters();
         applyFilters();
+
+        setStatus("Monitoring loaded. Loading Evaluation...");
       })
       .catch(err => {
         console.error("Error loading Monitoring CSV:", err);
+        setStatus("Monitoring error: " + err.message);
+
         const tbody = document.getElementById('monitoring-body');
         if (tbody) {
           tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
-          td.colSpan = 4;
+          td.colSpan = 99;
           td.textContent = "Error loading monitoring data: " + err.message;
           tr.appendChild(td);
           tbody.appendChild(tr);
@@ -1112,26 +1148,39 @@
   function loadEvaluationTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd_zFcgy_c_5JDgK9wTVFLi5WeHTPF4uQBq9cOPl8vurc2DVu3DWrqwXiE1FmGcL5f2TtWjWLlGs1L/pub?gid=1608876672&single=true&output=csv";
 
-    fetch(csvUrl)
+    setStatus("Loading Evaluation CSV...");
+
+    fetch(csvUrl, { cache: "no-store" })
       .then(response => {
-        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
+        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching Evaluation CSV");
         return response.text();
       })
       .then(text => {
+        if (looksLikeHtmlNotCsv(text)) {
+          throw new Error(
+            "Evaluation link is NOT returning CSV. It looks like an HTML consent/access page. " +
+            "Fix: In Google Sheets -> File -> Share -> Publish to the web -> CSV, then use that published CSV link."
+          );
+        }
+
         const rows = parseCSV(text);
-        if (!rows || rows.length === 0) throw new Error("Evaluation CSV file is empty or could not be parsed.");
+        if (!rows || rows.length <= 1) throw new Error("Evaluation CSV parsed but has no data rows.");
 
         evaluationRows = rows;
         applyFilters();
+
+        setStatus("Monitoring + Evaluation loaded successfully.");
       })
       .catch(err => {
         console.error("Error loading Evaluation CSV:", err);
+        setStatus("Evaluation error: " + err.message);
+
         const tbody = document.getElementById('evaluation-body');
         if (tbody) {
           tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
-          td.colSpan = 4;
+          td.colSpan = 99;
           td.textContent = "Error loading evaluation data: " + err.message;
           tr.appendChild(td);
           tbody.appendChild(tr);
@@ -1297,7 +1346,7 @@
     updateMonitoringKPIs(monitorForView);
     updateEvaluationKPIs(evalForView);
 
-    // ✅ NEW: Overview traffic-light KPIs + charts
+    // ✅ Overview traffic-light KPIs + charts
     updateOverviewKPIs(monitorForView, evalForView);
   }
 
@@ -1312,7 +1361,6 @@
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
-    // ✅ NEW: normalization to avoid mismatch due to casing / double spaces
     const norm = s => String(s || '').trim().replace(/\s+/g,' ').toLowerCase();
 
     const filteredDataRows = allRows.slice(1).filter(row => {
@@ -2188,13 +2236,12 @@
     });
   }
 
-  // ✅ NEW: Overview KPIs (Monitoring + Evaluation + Combined)
+  // ✅ Overview KPIs (Monitoring + Evaluation + Combined)
   function updateOverviewKPIs(monitorRows, evalRows) {
     const barCanvas = document.getElementById("ov-kpi-bar");
     const donutCanvas = document.getElementById("ov-kpi-donut");
     if (!barCanvas || !donutCanvas) return;
 
-    // --- Monitoring overall % (from monitoring rows)
     let monOverallPct = 0;
     let monBad = 0, monWarn = 0, monGood = 0;
 
@@ -2224,7 +2271,6 @@
 
       monOverallPct = pcts.length ? Math.round(pcts.reduce((a, x) => a + x, 0) / pcts.length) : 0;
 
-      // Distribution counts (row-level)
       const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
       dataRows.forEach(row => {
         const vals = [];
@@ -2242,7 +2288,6 @@
       });
     }
 
-    // --- Evaluation outcome/impact/performance % and distribution counts
     let evOutcomePct = 0, evImpactPct = 0, evPerfPct = 0;
     let evBad = 0, evWarn = 0, evGood = 0;
 
@@ -2424,7 +2469,7 @@
 
     if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
 
-    const organization = document.getElementById('filter-organization')?.value || ''; // ✅ UPDATED
+    const organization = document.getElementById('filter-organization')?.value || '';
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
@@ -2441,7 +2486,7 @@
       mode,
       user_prompt: prompt,
       include_filters: includeFilters,
-      filters: { organization, project, period, location }, // ✅ UPDATED
+      filters: { organization, project, period, location },
       kpi_snapshot: kpis
     };
 

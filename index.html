@@ -713,6 +713,12 @@
         </table>
       </div>
 
+      <!-- ✅ NEW: Evaluation Summary Chart -->
+      <div class="table-wrapper" style="margin-top:12px;">
+        <strong style="font-size:0.85rem;">Evaluation Summary – Average Ratings</strong>
+        <canvas id="eval-chart-ratings"></canvas>
+      </div>
+
       <div class="legend">
         <strong>Evaluation rating colour key (1–5):</strong>
         <span class="status-bad">1–2 = Weak / Unsatisfactory</span>
@@ -963,6 +969,9 @@
   // ✅ NEW: Monitoring summary charts under Live CSV Feed
   let monOverallByGroupChart = null;
   let monBenefByGroupChart = null;
+
+  // ✅ NEW: Evaluation chart
+  let evalRatingsChart = null;
 
   // ===========================
   // LOGIN & INIT
@@ -1224,6 +1233,9 @@
 
     // ✅ NEW: update Monitoring summary charts under Live CSV Feed
     updateMonitoringSummaryCharts(monitorForView);
+
+    // ✅ NEW: update Evaluation charts
+    updateEvaluationCharts(evalForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
@@ -1423,7 +1435,6 @@
   }
 
   // ===== KPI / CARD HELPERS =====
-
   function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
@@ -1599,7 +1610,7 @@
     const avgCoord    = idxCoord !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'coordination with partners') : 0;
 
     const ratingLabels = ['Activity', 'Budget', 'Staff', 'Community', 'Coordination'];
-    theRatingData = [avgActivity, avgBudget, avgStaff, avgComm, avgCoord];
+    const theRatingData = [avgActivity, avgBudget, avgStaff, avgComm, avgCoord];
 
     if (avgRatingsChart) avgRatingsChart.destroy();
     avgRatingsChart = new Chart(ctx1, {
@@ -1824,6 +1835,68 @@
         responsive: true,
         scales: {
           y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // ===========================
+  // ✅ NEW: Evaluation Charts
+  // ===========================
+  function updateEvaluationCharts(evalRows) {
+    const canvas = document.getElementById("eval-chart-ratings");
+    if (!canvas) return;
+
+    if (!evalRows || evalRows.length <= 1) {
+      if (evalRatingsChart) {
+        evalRatingsChart.destroy();
+        evalRatingsChart = null;
+      }
+      return;
+    }
+
+    const headerRow = evalRows[0];
+    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+
+    // Find all columns containing "rating"
+    const ratingCols = [];
+    headersLower.forEach((h, idx) => {
+      if (h.includes("rating")) ratingCols.push(idx);
+    });
+
+    if (!ratingCols.length) return;
+
+    const labels = ratingCols.map(i => headerRow[i]);
+    const sums = new Array(ratingCols.length).fill(0);
+    const counts = new Array(ratingCols.length).fill(0);
+
+    for (let i = 1; i < evalRows.length; i++) {
+      const row = evalRows[i];
+      ratingCols.forEach((colIdx, j) => {
+        const v = parseFloat(row[colIdx]);
+        if (!isNaN(v)) {
+          sums[j] += v;
+          counts[j]++;
+        }
+      });
+    }
+
+    const avgs = sums.map((s, i) => (counts[i] ? +(s / counts[i]).toFixed(2) : 0));
+
+    if (evalRatingsChart) evalRatingsChart.destroy();
+    evalRatingsChart = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Average Evaluation Rating (1–5)",
+          data: avgs
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, suggestedMax: 5 }
         }
       }
     });

@@ -443,10 +443,10 @@
     <div id="filters-bar" class="filters-bar">
       <strong>Filters:</strong>
 
-      <!-- ✅ NEW: Organization filter (before Project) -->
+      <!-- ✅ UPDATED: Rename filter label + ID to match “Implementing Agency / Organization” -->
       <label>
-        Organization:
-        <select id="filter-org">
+        Implementing Agency / Organization:
+        <select id="filter-organization">
           <option value="">All</option>
         </select>
       </label>
@@ -1144,14 +1144,14 @@
   function setupFilterListeners() {
     if (filtersInitialized) return;
 
-    const orgSel = document.getElementById('filter-org');     // ✅ NEW
+    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
     function onChange() { applyFilters(); }
 
-    if (orgSel) orgSel.addEventListener('change', onChange);  // ✅ NEW
+    if (orgSel) orgSel.addEventListener('change', onChange); // ✅ UPDATED
     if (projSel) projSel.addEventListener('change', onChange);
     if (periodSel) periodSel.addEventListener('change', onChange);
     if (locSel) locSel.addEventListener('change', onChange);
@@ -1165,23 +1165,23 @@
     const headerRow = monitoringRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ NEW
+    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ MATCHES SHEET HEADER
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
-    const orgSel = document.getElementById('filter-org');      // ✅ NEW
+    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
-    if (!orgSel || !projSel || !periodSel || !locSel) return;  // ✅ UPDATED
+    if (!orgSel || !projSel || !periodSel || !locSel) return;
 
-    const currentOrg = orgSel.value;                           // ✅ NEW
+    const currentOrg = orgSel.value;
     const currentProj = projSel.value;
     const currentPeriod = periodSel.value;
     const currentLoc = locSel.value;
 
-    const orgs = new Set();                                    // ✅ NEW
+    const orgs = new Set();
     const projects = new Set();
     const periods = new Set();
     const locations = new Set();
@@ -1189,7 +1189,7 @@
     const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
     dataRows.forEach(row => {
-      if (idxOrg !== -1 && row[idxOrg]) orgs.add(row[idxOrg].trim());          // ✅ NEW
+      if (idxOrg !== -1 && row[idxOrg]) orgs.add(row[idxOrg].trim());
       if (idxProject !== -1 && row[idxProject]) projects.add(row[idxProject].trim());
       if (idxPeriod !== -1 && row[idxPeriod]) periods.add(row[idxPeriod].trim());
       if (idxLocation !== -1 && row[idxLocation]) locations.add(row[idxLocation].trim());
@@ -1212,24 +1212,24 @@
       else select.value = "";
     }
 
-    refillSelect(orgSel, orgs, currentOrg);                     // ✅ NEW
+    refillSelect(orgSel, orgs, currentOrg);
     refillSelect(projSel, projects, currentProj);
     refillSelect(periodSel, periods, currentPeriod);
     refillSelect(locSel, locations, currentLoc);
   }
 
   function applyFilters() {
-    const orgSel = document.getElementById('filter-org');       // ✅ NEW
+    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
-    const org = orgSel ? orgSel.value : "";                     // ✅ NEW
+    const organization = orgSel ? orgSel.value : "";
     const project = projSel ? projSel.value : "";
     const period = periodSel ? periodSel.value : "";
     const location = locSel ? locSel.value : "";
 
-    monitoringFilteredRows = filterMonitoringRows(monitoringRows, org, project, period, location); // ✅ UPDATED
+    monitoringFilteredRows = filterMonitoringRows(monitoringRows, organization, project, period, location);
     evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
 
     const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
@@ -1253,30 +1253,34 @@
     updateOverviewKPIs(monitorForView, evalForView);
   }
 
-  function filterMonitoringRows(allRows, org, project, period, location) {     // ✅ UPDATED
+  function filterMonitoringRows(allRows, organization, project, period, location) {
     if (!allRows.length || allRows.length <= 1) return [];
 
     const headerRow = allRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ NEW
+    const idxOrg = headersLower.indexOf('implementing agency / organization');
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
+    // ✅ NEW: normalization to avoid mismatch due to casing / double spaces
+    const norm = s => String(s || '').trim().replace(/\s+/g,' ').toLowerCase();
+
     const filteredDataRows = allRows.slice(1).filter(row => {
       if (row.every(c => c.trim() === "")) return false;
 
-      const o = idxOrg !== -1 ? (row[idxOrg] || '').trim() : '';               // ✅ NEW
+      const o = idxOrg !== -1 ? (row[idxOrg] || '').trim() : '';
       const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
       const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
       const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
 
-      const matchOrg = org ? o === org : true;                                 // ✅ NEW
+      const matchOrg = organization ? norm(o) === norm(organization) : true;
       const matchProj = project ? p === project : true;
       const matchPer = period ? per === period : true;
       const matchLoc = location ? loc === location : true;
-      return matchOrg && matchProj && matchPer && matchLoc;                    // ✅ UPDATED
+
+      return matchOrg && matchProj && matchPer && matchLoc;
     });
 
     if (!filteredDataRows.length) return [];
@@ -2372,7 +2376,7 @@
 
     if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
 
-    const org = document.getElementById('filter-org')?.value || '';           // ✅ NEW
+    const organization = document.getElementById('filter-organization')?.value || ''; // ✅ UPDATED
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
@@ -2389,7 +2393,7 @@
       mode,
       user_prompt: prompt,
       include_filters: includeFilters,
-      filters: { org, project, period, location },                           // ✅ UPDATED
+      filters: { organization, project, period, location }, // ✅ UPDATED
       kpi_snapshot: kpis
     };
 

@@ -16,9 +16,7 @@
       --status-bad: #b22222;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -27,7 +25,7 @@
       color: #333;
     }
 
-    /* LOGIN SCREEN */
+    /* LOGIN */
     #login-screen {
       min-height: 100vh;
       display: flex;
@@ -35,473 +33,149 @@
       justify-content: center;
       background: linear-gradient(135deg, #003366, #005599);
       color: #fff;
-      padding: 16px;
     }
 
     .login-card {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.08);
+      padding: 22px;
       border-radius: 12px;
-      padding: 20px 24px;
+      width: 100%;
       max-width: 360px;
-      width: 100%;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,.3);
     }
 
-    .login-card h2 {
-      margin: 0 0 8px;
-      font-size: 1.2rem;
-    }
-
-    .login-card p {
-      margin: 0 0 14px;
-      font-size: 0.85rem;
-      opacity: 0.9;
-    }
-
-    .login-card label {
-      display: block;
-      font-size: 0.8rem;
-      margin-top: 8px;
-    }
-
+    .login-card h2 { margin: 0 0 6px; }
+    .login-card label { display:block; font-size:.8rem; margin-top:8px; }
     .login-card input {
-      width: 100%;
-      padding: 6px 8px;
-      margin-top: 4px;
-      border-radius: 6px;
-      border: none;
-      font-size: 0.85rem;
+      width:100%; padding:6px; border-radius:6px; border:none;
     }
 
     .login-btn {
-      margin-top: 14px;
-      width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
-      background: #ffcc00;
-      color: #003366;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.9rem;
+      margin-top:14px;
+      width:100%;
+      padding:8px;
+      border:none;
+      border-radius:8px;
+      background:#ffcc00;
+      font-weight:bold;
+      cursor:pointer;
     }
 
-    .login-btn:hover {
-      opacity: 0.95;
-    }
-
-    .login-hint {
-      margin-top: 10px;
-      font-size: 0.75rem;
-      opacity: 0.85;
-    }
-
-    /* APP ROOT */
-    #app-root {
-      display: none;
-    }
+    #app-root { display:none; }
 
     header {
       background: var(--primary);
-      color: #fff;
-      padding: 16px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.4rem;
-    }
-
-    header p {
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-      opacity: 0.9;
+      color:#fff;
+      padding:16px;
+      text-align:center;
     }
 
     .container {
-      padding: 16px;
-      max-width: 1100px;
-      margin: 0 auto;
+      padding:16px;
+      max-width:1100px;
+      margin:auto;
     }
 
-    /* FILTER BAR */
     .filters-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 0.8rem;
-      background: #e9f1ff;
-      padding: 8px 10px;
-      border-radius: 8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      background:#e9f1ff;
+      padding:8px;
+      border-radius:8px;
+      font-size:.8rem;
+      margin-bottom:12px;
     }
 
-    .filters-bar label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .filters-bar select {
-      padding: 4px 6px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 0.8rem;
-      background: #fff;
-    }
-
-    /* Card grid */
     .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:12px;
+      margin-bottom:18px;
     }
 
     .card {
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.15s, background 0.15s;
-      font-size: 0.9rem;
+      background:#fff;
+      padding:14px;
+      border-radius:10px;
+      box-shadow:0 3px 6px rgba(0,0,0,.08);
+      text-align:center;
+      cursor:pointer;
     }
 
-    .card h3 {
-      margin: 0 0 6px;
-      color: var(--primary);
-      font-size: 1rem;
-    }
-
-    .card p {
-      margin: 0;
-      font-size: 0.8rem;
-      opacity: 0.9;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      background: var(--primary-light);
-    }
-
-    /* Sections */
     .section {
-      display: none;
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-      margin-bottom: 24px;
-      font-size: 0.9rem;
+      display:none;
+      background:#fff;
+      padding:16px;
+      border-radius:10px;
+      box-shadow:0 3px 6px rgba(0,0,0,.08);
+      margin-bottom:24px;
     }
 
-    .section h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-
-    .section p {
-      margin: 4px 0 10px;
-      font-size: 0.85rem;
-    }
-
-    .close-btn {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      margin-top: 10px;
-    }
-
-    .close-btn:hover {
-      opacity: 0.9;
-    }
-
-    /* Responsive table wrapper */
     .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
-      background: #fff;
-      margin-top: 8px;
-      padding: 4px;
+      overflow-x:auto;
+      border:1px solid #e0e0e0;
+      border-radius:8px;
+      padding:4px;
+      margin-top:8px;
     }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      min-width: 480px; /* allows horizontal scroll on very small screens */
+      width:100%;
+      border-collapse:collapse;
+      font-size:.8rem;
+      min-width:480px;
     }
 
     th, td {
-      border-bottom: 1px solid #eee;
-      padding: 6px 8px;
-      text-align: left;
-      white-space: nowrap;
+      padding:6px;
+      border-bottom:1px solid #eee;
+      white-space:nowrap;
     }
 
     th {
-      background: #eef3fb;
-      color: var(--primary);
-      font-weight: bold;
+      background:#eef3fb;
+      color:var(--primary);
     }
 
-    tr:nth-child(even) td {
-      background: #fafafa;
-    }
+    .status-good { color:var(--status-good); font-weight:bold; }
+    .status-warn { color:var(--status-warn); font-weight:bold; }
+    .status-bad  { color:var(--status-bad);  font-weight:bold; }
 
-    .info-note {
-      font-size: 0.75rem;
-      color: #666;
-      margin-top: 4px;
-    }
-
-    /* Status colours for numeric ratings */
-    .status-good {
-      color: var(--status-good);
-      font-weight: bold;
-    }
-    .status-warn {
-      color: var(--status-warn);
-      font-weight: bold;
-    }
-    .status-bad {
-      color: var(--status-bad);
-      font-weight: bold;
-    }
-
-    .legend {
-      margin-top: 6px;
-      font-size: 0.75rem;
-    }
-
-    .legend span {
-      margin-right: 12px;
-    }
-
-    footer {
-      background: var(--primary);
-      color: #fff;
-      text-align: center;
-      padding: 10px;
-      font-size: 0.8rem;
-      margin-top: 30px;
-    }
-
-    /* KPI layout for Overview / Reports / Learning */
     .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin: 10px 0 16px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:10px;
+      margin:12px 0;
     }
 
     .kpi-box {
-      background: var(--primary-light);
-      border-radius: 8px;
-      padding: 10px;
-      text-align: left;
+      background:var(--primary-light);
+      border-radius:8px;
+      padding:10px;
     }
 
-    .kpi-label {
-      font-size: 0.75rem;
-      color: #555;
-      margin-bottom: 4px;
-    }
+    .kpi-label { font-size:.75rem; }
+    .kpi-value { font-size:1.1rem; font-weight:bold; }
 
-    .kpi-value {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
+    canvas { max-width:100%; }
 
-    /* Learning list */
-    #learning-list {
-      list-style: none;
-      padding-left: 0;
-      margin: 8px 0 0;
-      font-size: 0.8rem;
-    }
-
-    #learning-list li {
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #eee;
-    }
-
-    /* Data entry forms */
-    .data-form {
-      background: #f7f9ff;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.8rem;
-    }
-
-    .data-form h3 {
-      margin: 0 0 8px;
-      font-size: 0.95rem;
-      color: var(--primary);
-    }
-
-    .data-form label {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.8rem;
-    }
-
-    .data-form input,
-    .data-form select,
-    .data-form textarea {
-      width: 100%;
-      padding: 5px 6px;
-      margin-top: 3px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 0.8rem;
-    }
-
-    .data-form textarea {
-      resize: vertical;
-      min-height: 50px;
-    }
-
-    .data-form button {
-      margin-top: 10px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: none;
-      background: var(--primary);
-      color: #fff;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .data-form button:hover {
-      opacity: 0.9;
-    }
-
-    canvas {
-      max-width: 100%;
-    }
-
-    /* ===========================
-       AI ASSISTANT (OPENAI) UI
-       =========================== */
-
-    .ai-chat-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .ai-input-panel,
-    .ai-output-panel {
-      background: #f7f9ff;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.85rem;
-    }
-
-    .ai-input-panel h3,
-    .ai-output-panel h3 {
-      margin: 0 0 8px;
-      font-size: 0.95rem;
-      color: var(--primary);
-    }
-
-    .ai-input-panel label {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.8rem;
-    }
-
-    .ai-input-panel select,
-    .ai-input-panel textarea {
-      width: 100%;
-      padding: 5px 6px;
-      margin-top: 3px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 0.8rem;
-    }
-
-    .ai-input-panel textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .ai-input-panel button {
-      margin-top: 10px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: none;
-      background: var(--primary);
-      color: #fff;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    .ai-input-panel button:hover {
-      opacity: 0.9;
-    }
-
-    .ai-inline-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 8px;
-      font-size: 0.8rem;
-    }
-
-    #ai-response-box {
-      background: #ffffff;
-      border-radius: 8px;
-      min-height: 80px;
-      max-height: 320px;
-      overflow-y: auto;
-      padding: 8px;
-      border: 1px solid #dde3f3;
-      white-space: pre-wrap;
-      font-size: 0.8rem;
-    }
-
-    #ai-status {
-      margin-top: 6px;
-      font-size: 0.75rem;
-      color: #555;
-    }
-
-    @media (min-width: 768px) {
-      .ai-chat-container {
-        flex-direction: row;
-      }
-      .ai-input-panel,
-      .ai-output-panel {
-        flex: 1;
-      }
+    footer {
+      background:var(--primary);
+      color:#fff;
+      padding:10px;
+      text-align:center;
+      font-size:.8rem;
     }
   </style>
 </head>
-
-<body>
-
 <!-- LOGIN SCREEN -->
 <div id="login-screen">
   <div class="login-card">
     <h2>ProMEL Dashboard Login</h2>
-    <p>Secure access to the PMCEL Monitoring, Evaluation &amp; Learning dashboard.</p>
+    <p style="margin:0 0 12px; font-size:.85rem; opacity:.9;">
+      Secure access to the PMCEL Monitoring, Evaluation &amp; Learning dashboard.
+    </p>
 
     <form id="login-form">
       <label for="login-username">Username</label>
@@ -513,7 +187,7 @@
       <button type="submit" class="login-btn">Login</button>
     </form>
 
-    <div class="login-hint">
+    <div style="margin-top:10px; font-size:.75rem; opacity:.9;">
       Default (change later in code):<br>
       <strong>Username:</strong> <code>admin</code><br>
       <strong>Password:</strong> <code>ProMEL@2025</code>
@@ -524,8 +198,10 @@
 <!-- APP ROOT -->
 <div id="app-root">
   <header>
-    <h1>ProMEL Analytics Solutions</h1>
-    <p>Project Monitoring &amp; Control, Evaluation &amp; Learning (PMCEL) Dashboard</p>
+    <h1 style="margin:0; font-size:1.4rem;">ProMEL Analytics Solutions</h1>
+    <p style="margin:4px 0 0; font-size:.9rem; opacity:.9;">
+      Project Monitoring &amp; Control, Evaluation &amp; Learning (PMCEL) Dashboard
+    </p>
   </header>
 
   <div class="container">
@@ -533,18 +209,21 @@
     <!-- Filters -->
     <div id="filters-bar" class="filters-bar">
       <strong>Filters:</strong>
+
       <label>
         Project:
         <select id="filter-project">
           <option value="">All</option>
         </select>
       </label>
+
       <label>
         Period:
         <select id="filter-period">
           <option value="">All</option>
         </select>
       </label>
+
       <label>
         Location:
         <select id="filter-location">
@@ -556,52 +235,50 @@
     <!-- Navigation cards -->
     <div class="cards">
       <div class="card" onclick="openSection('overview')">
-        <h3>Overview</h3>
-        <p>High-level project performance summary.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Overview</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">High-level project performance summary.</p>
       </div>
 
       <div class="card" onclick="openSection('monitoring')">
-        <h3>Monitoring &amp; Control</h3>
-        <p>Live data from ProMEL Monitoring Google Sheet (CSV feed).</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Monitoring &amp; Control</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Live data from Monitoring Google Sheet (CSV feed).</p>
       </div>
 
       <div class="card" onclick="openSection('evaluation')">
-        <h3>Evaluation</h3>
-        <p>Findings and ratings from Evaluation Google Sheet (CSV feed).</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Evaluation</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Findings and ratings from Evaluation Google Sheet (CSV feed).</p>
       </div>
 
       <div class="card" onclick="openSection('learning')">
-        <h3>Learning</h3>
-        <p>Lessons learned &amp; adaptive management.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Learning</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Lessons learned &amp; adaptive management.</p>
       </div>
 
       <div class="card" onclick="openSection('reports')">
-        <h3>Reports</h3>
-        <p>Monitoring and evaluation reporting hub.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Reports</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Monitoring and evaluation reporting hub.</p>
       </div>
 
       <div class="card" onclick="openSection('dataentry')">
-        <h3>Data Entry</h3>
-        <p>Quick Monitoring &amp; Evaluation input forms.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Data Entry</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Quick Monitoring &amp; Evaluation input forms.</p>
       </div>
 
       <div class="card" onclick="openSection('powerbi')">
-        <h3>Power BI Dashboard</h3>
-        <p>Integrated business intelligence view.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">Power BI Dashboard</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Integrated business intelligence view.</p>
       </div>
 
       <div class="card" onclick="openSection('openai')">
-        <h3>AI Assistant (OpenAI)</h3>
-        <p>Analyse trends &amp; generate MEL reports.</p>
+        <h3 style="margin:0 0 6px; color:var(--primary);">AI Assistant (OpenAI)</h3>
+        <p style="margin:0; font-size:.8rem; opacity:.9;">Analyse trends &amp; generate MEL reports.</p>
       </div>
     </div>
 
-    <!-- Sections -->
-
     <!-- OVERVIEW -->
     <div id="overview" class="section">
-      <h2>Project Overview</h2>
-      <p>
+      <h2 style="margin-top:0; color:var(--primary);">Project Overview</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
         Live summary of key PMCEL indicators based on Monitoring &amp; Evaluation data.
         Filters at the top (Project, Period, Location) adjust the figures below.
       </p>
@@ -637,41 +314,34 @@
         <canvas id="chart-beneficiaries"></canvas>
       </div>
 
-      <button class="close-btn" onclick="closeSection('overview')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('overview')">Close</button>
     </div>
 
     <!-- MONITORING -->
     <div id="monitoring" class="section">
-      <h2>Monitoring &amp; Control – Live CSV Feed</h2>
-      <p>
-        The table below is populated from the ProMEL Monitoring Google Sheet published as a CSV link.
-        It is designed to be mobile friendly and scrollable on small screens. Filters at the top will
-        also reduce this table to the selected project/period/location.
+      <h2 style="margin-top:0; color:var(--primary);">Monitoring &amp; Control – Live CSV Feed</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
+        The table below is populated from the Monitoring Google Sheet published as a CSV link.
+        Filters at the top will reduce this table to the selected project/period/location.
       </p>
 
       <div class="table-wrapper">
         <table>
-          <thead id="monitoring-head">
-            <!-- CSV header row will be inserted here -->
-          </thead>
-          <tbody id="monitoring-body">
-            <!-- CSV data rows will be inserted here -->
-          </tbody>
+          <thead id="monitoring-head"></thead>
+          <tbody id="monitoring-body"></tbody>
         </table>
       </div>
 
-      <!-- ✅ NEW: Monitoring summary graphs (by Period / Month) -->
+      <!-- ✅ Monitoring summary graphs (by Period / Month) -->
       <div class="table-wrapper" style="margin-top:12px;">
-        <div class="info-note" style="margin:6px 4px 10px;">
+        <div style="margin:6px 4px 10px; font-size:.8rem; color:#666;">
           <strong>Monitoring Summary Graphs</strong> (auto from filtered table)
-          &nbsp;|&nbsp;
-          Group by:
+          &nbsp;|&nbsp; Group by:
           <select id="mon-groupby" style="padding:4px 6px; border-radius:6px; border:1px solid #ccc;">
             <option value="period" selected>Reporting Period</option>
             <option value="month">Month (from Reporting Date)</option>
           </select>
         </div>
-
         <canvas id="mon-chart-overall-by-group"></canvas>
       </div>
 
@@ -679,79 +349,90 @@
         <canvas id="mon-chart-beneficiaries-by-group"></canvas>
       </div>
 
-      <div class="legend">
+      <div style="margin-top:10px; font-size:.78rem;">
         <strong>Monitoring rating colour key (1–5):</strong>
-        <span class="status-bad">1–2 = Off-track / Poor</span>
-        <span class="status-warn">3 = Moderate / Watch</span>
+        <span class="status-bad">1–2 = Off-track / Poor</span>&nbsp;&nbsp;
+        <span class="status-warn">3 = Moderate / Watch</span>&nbsp;&nbsp;
         <span class="status-good">4–5 = On-track / Good</span>
       </div>
 
-      <div class="info-note">
+      <div style="margin-top:6px; font-size:.75rem; color:#666;">
         On mobile, swipe left/right to view all columns.
       </div>
 
-      <button class="close-btn" onclick="closeSection('monitoring')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('monitoring')">Close</button>
     </div>
 
     <!-- EVALUATION -->
     <div id="evaluation" class="section">
-      <h2>Evaluation – Live CSV Feed</h2>
-      <p>
+      <h2 style="margin-top:0; color:var(--primary);">Evaluation – Live CSV Feed</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
         The table below is populated from the Evaluation Google Sheet published as a CSV link.
-        It provides an overview of evaluation phase, overall rating, key findings and recommendations.
         Filters at the top adjust this table as well.
       </p>
 
+      <!-- ✅ NEW: Evaluation Overall Ratings (Auto % + Statistics) -->
+      <div class="kpi-grid" style="margin-top:4px;">
+        <div class="kpi-box">
+          <div class="kpi-label">Overall Outcome Rating</div>
+          <div class="kpi-value" id="ev-outcome-score">0.0 / 5</div>
+          <div style="font-size:.78rem; opacity:.9;" id="ev-outcome-percent">0%</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Overall Impact Rating</div>
+          <div class="kpi-value" id="ev-impact-score">0.0 / 5</div>
+          <div style="font-size:.78rem; opacity:.9;" id="ev-impact-percent">0%</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Overall Project Performance Rating</div>
+          <div class="kpi-value" id="ev-performance-score">0.0 / 5</div>
+          <div style="font-size:.78rem; opacity:.9;" id="ev-performance-percent">0%</div>
+        </div>
+      </div>
+
+      <!-- Optional visual: Outcome vs Impact averages -->
+      <div class="table-wrapper" style="margin-top:12px;">
+        <canvas id="ev-chart-outcome-impact"></canvas>
+      </div>
+
       <div class="table-wrapper">
         <table>
-          <thead id="evaluation-head">
-            <!-- Evaluation CSV header row will be inserted here -->
-          </thead>
-          <tbody id="evaluation-body">
-            <!-- Evaluation CSV data rows will be inserted here -->
-          </tbody>
+          <thead id="evaluation-head"></thead>
+          <tbody id="evaluation-body"></tbody>
         </table>
       </div>
 
-      <!-- ✅ NEW: Evaluation Summary Chart -->
-      <div class="table-wrapper" style="margin-top:12px;">
-        <strong style="font-size:0.85rem;">Evaluation Summary – Average Ratings</strong>
-        <canvas id="eval-chart-ratings"></canvas>
-      </div>
-
-      <div class="legend">
+      <div style="margin-top:10px; font-size:.78rem;">
         <strong>Evaluation rating colour key (1–5):</strong>
-        <span class="status-bad">1–2 = Weak / Unsatisfactory</span>
-        <span class="status-warn">3 = Fair / Needs improvement</span>
+        <span class="status-bad">1–2 = Weak / Unsatisfactory</span>&nbsp;&nbsp;
+        <span class="status-warn">3 = Fair / Needs improvement</span>&nbsp;&nbsp;
         <span class="status-good">4–5 = Good / Strong</span>
       </div>
 
-      <div class="info-note">
+      <div style="margin-top:6px; font-size:.75rem; color:#666;">
         On mobile, swipe left/right to view all columns.
       </div>
 
-      <button class="close-btn" onclick="closeSection('evaluation')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('evaluation')">Close</button>
     </div>
 
     <!-- LEARNING -->
     <div id="learning" class="section">
-      <h2>Learning &amp; Knowledge</h2>
-      <p>
+      <h2 style="margin-top:0; color:var(--primary);">Learning &amp; Knowledge</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
         Recent achievements, challenges and management recommendations from Monitoring data,
         filtered by the selections at the top.
       </p>
 
-      <ul id="learning-list">
-        <!-- Live learning items inserted from Monitoring Google Sheet CSV -->
-      </ul>
+      <ul id="learning-list" style="list-style:none; padding-left:0; margin:8px 0 0; font-size:.85rem;"></ul>
 
-      <button class="close-btn" onclick="closeSection('learning')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('learning')">Close</button>
     </div>
 
     <!-- REPORTS -->
     <div id="reports" class="section">
-      <h2>Reports</h2>
-      <p>
+      <h2 style="margin-top:0; color:var(--primary);">Reports</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
         Live reporting status from Monitoring records. You can also export a quick PDF summary
         of the Overview KPIs for management or donors.
       </p>
@@ -771,170 +452,102 @@
         </div>
       </div>
 
-      <button class="close-btn" onclick="generatePDFReport()">Download PDF Summary</button>
-      <button class="close-btn" style="margin-left:6px;" onclick="closeSection('reports')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="generatePDFReport()">Download PDF Summary</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff; margin-top:8px;" onclick="closeSection('reports')">Close</button>
     </div>
 
     <!-- DATA ENTRY -->
     <div id="dataentry" class="section">
-      <h2>Data Entry (Monitoring &amp; Evaluation)</h2>
-      <p>
+      <h2 style="margin-top:0; color:var(--primary);">Data Entry (Monitoring &amp; Evaluation)</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
         These forms are a front-end template. To send data directly into Google Sheets, connect
         them to a Google Apps Script Web App or Google Form endpoint in the JavaScript code.
       </p>
 
       <div class="kpi-grid">
-        <form id="monitoring-entry-form" class="data-form">
-          <h3>Monitoring Input</h3>
-          <label>
-            Project Name
-            <input name="projectName" required>
-          </label>
-          <label>
-            Reporting Period
-            <input name="reportingPeriod" placeholder="e.g. Quarter 4, 2025" required>
-          </label>
-          <label>
-            Province / District / Location
-            <input name="location">
-          </label>
-          <label>
-            Activity Implementation on Schedule (1–5)
-            <input name="activityRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Budget Utilization as Planned (1–5)
-            <input name="budgetRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Staff Availability (1–5)
-            <input name="staffRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Community Participation (1–5)
-            <input name="communityRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Coordination with Partners (1–5)
-            <input name="coordinationRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Number of Beneficiaries Reached
-            <input name="beneficiaries" type="number" min="0">
-          </label>
-          <label>
-            Main Achievements this Period
-            <textarea name="achievements"></textarea>
-          </label>
-          <label>
-            Key Challenges / Risks
-            <textarea name="challenges"></textarea>
-          </label>
-          <label>
-            Immediate Actions / Recommendations
-            <textarea name="actions"></textarea>
-          </label>
-          <button type="submit">Submit Monitoring Entry (Demo)</button>
+        <form id="monitoring-entry-form" style="background:#f7f9ff; border-radius:10px; padding:10px;">
+          <h3 style="margin:0 0 8px; color:var(--primary);">Monitoring Input</h3>
+          <label>Project Name <input name="projectName" required style="width:100%; padding:6px;"></label>
+          <label>Reporting Period <input name="reportingPeriod" required style="width:100%; padding:6px;"></label>
+          <label>Province / District / Location <input name="location" style="width:100%; padding:6px;"></label>
+          <label>Activity Implementation on Schedule (1–5) <input name="activityRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Budget Utilization as Planned (1–5) <input name="budgetRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Staff Availability (1–5) <input name="staffRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Community Participation (1–5) <input name="communityRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Coordination with Partners (1–5) <input name="coordinationRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Number of Beneficiaries Reached <input name="beneficiaries" type="number" min="0" style="width:100%; padding:6px;"></label>
+          <label>Main Achievements this Period <textarea name="achievements" style="width:100%; padding:6px; min-height:60px;"></textarea></label>
+          <label>Key Challenges / Risks <textarea name="challenges" style="width:100%; padding:6px; min-height:60px;"></textarea></label>
+          <label>Immediate Actions / Recommendations <textarea name="actions" style="width:100%; padding:6px; min-height:60px;"></textarea></label>
+          <button type="submit" class="login-btn" style="background:var(--primary); color:#fff;">Submit Monitoring Entry (Demo)</button>
         </form>
 
-        <form id="evaluation-entry-form" class="data-form">
-          <h3>Evaluation Input</h3>
-          <label>
-            Project Name
-            <input name="evalProjectName" required>
-          </label>
-          <label>
-            Evaluation Phase
-            <input name="evalPhase" placeholder="Mid-term / Final / Review">
-          </label>
-          <label>
-            Outcome Rating (1–5)
-            <input name="outcomeRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Impact Rating (1–5)
-            <input name="impactRating" type="number" min="1" max="5">
-          </label>
-          <label>
-            Key Findings
-            <textarea name="findings"></textarea>
-          </label>
-          <label>
-            Recommendations
-            <textarea name="evalRecommendations"></textarea>
-          </label>
-          <button type="submit">Submit Evaluation Entry (Demo)</button>
+        <form id="evaluation-entry-form" style="background:#f7f9ff; border-radius:10px; padding:10px;">
+          <h3 style="margin:0 0 8px; color:var(--primary);">Evaluation Input</h3>
+          <label>Project Name <input name="evalProjectName" required style="width:100%; padding:6px;"></label>
+          <label>Evaluation Phase <input name="evalPhase" style="width:100%; padding:6px;"></label>
+          <label>Outcome Rating (1–5) <input name="outcomeRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Impact Rating (1–5) <input name="impactRating" type="number" min="1" max="5" style="width:100%; padding:6px;"></label>
+          <label>Key Findings <textarea name="findings" style="width:100%; padding:6px; min-height:60px;"></textarea></label>
+          <label>Recommendations <textarea name="evalRecommendations" style="width:100%; padding:6px; min-height:60px;"></textarea></label>
+          <button type="submit" class="login-btn" style="background:var(--primary); color:#fff;">Submit Evaluation Entry (Demo)</button>
         </form>
       </div>
 
-      <button class="close-btn" onclick="closeSection('dataentry')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('dataentry')">Close</button>
     </div>
 
     <!-- POWER BI -->
     <div id="powerbi" class="section">
-      <h2>Power BI Dashboard</h2>
-      <p>
-        When your Power BI report is ready and published, you can embed it here using an
-        &lt;iframe&gt; from Power BI.
+      <h2 style="margin-top:0; color:var(--primary);">Power BI Dashboard</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
+        When your Power BI report is ready and published, you can embed it here using an &lt;iframe&gt;.
       </p>
 
-      <!-- Example placeholder only -->
       <div class="table-wrapper" style="text-align:center; padding:16px; border-style:dashed;">
         Power BI embed placeholder.<br>
         Replace this box with the Power BI &lt;iframe&gt; when available.
       </div>
 
-      <button class="close-btn" onclick="closeSection('powerbi')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('powerbi')">Close</button>
     </div>
 
-    <!-- OPENAI ASSISTANT -->
+    <!-- OPENAI -->
     <div id="openai" class="section">
-      <h2>AI Assistant (OpenAI) – ProMEL Reasoning &amp; Reports</h2>
-      <p>
-        Use this assistant to interpret Monitoring &amp; Evaluation data, explain trends, and draft
-        narrative reports for donors or management. It sends your prompt and selected dashboard context
-        to a backend API endpoint.
+      <h2 style="margin-top:0; color:var(--primary);">AI Assistant (OpenAI) – ProMEL Reasoning &amp; Reports</h2>
+      <p style="margin:4px 0 10px; font-size:.85rem;">
+        Sends your prompt and selected dashboard context to a backend API endpoint.
       </p>
 
-      <div class="ai-chat-container">
-        <!-- INPUT SIDE -->
-        <div class="ai-input-panel">
-          <h3>Ask ProMEL AI</h3>
+      <div class="table-wrapper" style="padding:10px;">
+        <label style="display:block; font-size:.85rem; margin-bottom:6px;"><strong>Analysis focus</strong></label>
+        <select id="ai-mode" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+          <option value="explain_trends">Explain current trends & risks</option>
+          <option value="draft_report">Draft narrative report (Monitoring & Evaluation)</option>
+          <option value="learning_summary">Summarise key lessons & recommendations</option>
+          <option value="design_questions">Design MEL questions / indicators</option>
+          <option value="custom">Custom analysis</option>
+        </select>
 
-          <label for="ai-mode">Analysis focus</label>
-          <select id="ai-mode">
-            <option value="explain_trends">Explain current trends & risks</option>
-            <option value="draft_report">Draft narrative report (Monitoring & Evaluation)</option>
-            <option value="learning_summary">Summarise key lessons & recommendations</option>
-            <option value="design_questions">Design MEL questions / indicators</option>
-            <option value="custom">Custom analysis</option>
-          </select>
+        <label style="display:block; font-size:.85rem; margin:10px 0 6px;"><strong>Prompt / question</strong></label>
+        <textarea id="ai-prompt" style="width:100%; min-height:100px; padding:8px; border-radius:8px; border:1px solid #ccc;"
+          placeholder="e.g. Explain the current status of the project based on the latest Monitoring & Evaluation data and highlight any critical risks."></textarea>
 
-          <label for="ai-prompt">Prompt / question</label>
-          <textarea
-            id="ai-prompt"
-            placeholder="e.g. Explain the current status of the Function and Expenditure Review project based on the latest Monitoring & Evaluation data and highlight any critical risks."
-          ></textarea>
-
-          <div class="ai-inline-checkbox">
-            <input type="checkbox" id="ai-include-filters" checked>
-            <label for="ai-include-filters">Include current filters & KPI summary in analysis</label>
-          </div>
-
-          <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI (Demo)</button>
-          <div id="ai-status" class="info-note"></div>
+        <div style="margin-top:8px; font-size:.85rem;">
+          <input type="checkbox" id="ai-include-filters" checked>
+          <label for="ai-include-filters">Include current filters & KPI summary in analysis</label>
         </div>
 
-        <!-- OUTPUT SIDE -->
-        <div class="ai-output-panel">
-          <h3>AI Response</h3>
-          <div id="ai-response-box">
-            <!-- AI answer from backend will appear here -->
-          </div>
+        <button type="button" class="login-btn" style="background:var(--primary); color:#fff;" onclick="sendToAIAssistant()">Ask ProMEL AI (Demo)</button>
+        <div id="ai-status" style="font-size:.78rem; color:#666;"></div>
+
+        <div style="margin-top:10px;">
+          <strong>AI Response</strong>
+          <div id="ai-response-box" style="margin-top:6px; background:#fff; border:1px solid #dde3f3; padding:10px; border-radius:10px; white-space:pre-wrap; min-height:90px;"></div>
         </div>
       </div>
 
-      <button class="close-btn" onclick="closeSection('openai')">Close</button>
+      <button class="login-btn" style="background:var(--primary); color:#fff;" onclick="closeSection('openai')">Close</button>
     </div>
 
   </div>
@@ -952,8 +565,6 @@
   // ===========================
   // CONFIG: BACKEND AI ENDPOINT (DEMO)
   // ===========================
-  // For now, use httpbin.org/post as a dummy echo endpoint.
-  // Later, replace this with your real backend API that calls OpenAI securely.
   const AI_API_URL = "https://httpbin.org/post";
 
   // Global data arrays (include header row)
@@ -963,15 +574,16 @@
   let evaluationFilteredRows = [];
   let filtersInitialized = false;
 
+  // Charts
   let avgRatingsChart = null;
   let beneficiariesChart = null;
 
-  // ✅ NEW: Monitoring summary charts under Live CSV Feed
+  // ✅ Monitoring summary charts
   let monOverallByGroupChart = null;
   let monBenefByGroupChart = null;
 
-  // ✅ NEW: Evaluation chart
-  let evalRatingsChart = null;
+  // ✅ Evaluation summary chart (Outcome vs Impact)
+  let evOutcomeImpactChart = null;
 
   // ===========================
   // LOGIN & INIT
@@ -980,9 +592,6 @@
     const loginScreen = document.getElementById('login-screen');
     const appRoot = document.getElementById('app-root');
     const loginForm = document.getElementById('login-form');
-
-    // Optional: clear bad state if needed
-    // localStorage.removeItem('promelLoggedIn');
 
     const isLoggedIn = localStorage.getItem('promelLoggedIn') === 'true';
 
@@ -1000,9 +609,6 @@
         e.preventDefault();
         const user = document.getElementById('login-username').value.trim();
         const pass = document.getElementById('login-password').value.trim();
-
-        // SIMPLE, CLEAR LOGIN CHECK
-        console.log('Login attempt:', { user, passLength: pass.length });
 
         if (user === 'admin' && pass === 'ProMEL@2025') {
           localStorage.setItem('promelLoggedIn', 'true');
@@ -1025,7 +631,6 @@
   }
 
   function setupAutoRefresh() {
-    // Refresh monitoring & evaluation data every 60 seconds
     setInterval(() => {
       loadMonitoringTable();
       loadEvaluationTable();
@@ -1044,84 +649,52 @@
 
   function closeSection(id) {
     const el = document.getElementById(id);
-    if (el) {
-      el.style.display = 'none';
-    }
+    if (el) el.style.display = 'none';
   }
 
   // ===== CSV LOADERS =====
   function loadMonitoringTable() {
-    // Real Monitoring Google Sheets CSV link
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?gid=1298321526&single=true&output=csv";
 
     fetch(csvUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
-        }
-        return response.text();
-      })
+      .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(text => {
         const rows = parseCSV(text);
-        if (!rows || rows.length === 0) {
-          throw new Error("Monitoring CSV file is empty or could not be parsed.");
-        }
-
+        if (!rows || rows.length === 0) throw new Error("Monitoring CSV is empty or unparseable.");
         monitoringRows = rows;
         buildMonitoringFilters();
-        applyFilters(); // will render table + KPIs + charts
+        applyFilters();
       })
       .catch(err => {
-        console.error("Error loading Monitoring CSV:", err);
+        console.error("Monitoring CSV error:", err);
         const tbody = document.getElementById('monitoring-body');
         if (tbody) {
-          tbody.innerHTML = "";
-          const tr = document.createElement('tr');
-          const td = document.createElement('td');
-          td.colSpan = 4;
-          td.textContent = "Error loading monitoring data: " + err.message;
-          tr.appendChild(td);
-          tbody.appendChild(tr);
+          tbody.innerHTML = "<tr><td colspan='6'>Error loading monitoring data: " + err.message + "</td></tr>";
         }
       });
   }
 
   function loadEvaluationTable() {
-    // Real Evaluation Google Sheets CSV link
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd_zFcgy_c_5JDgK9wTVFLi5WeHTPF4uQBq9cOPl8vurc2DVu3DWrqwXiE1FmGcL5f2TtWjWLlGs1L/pub?gid=1608876672&single=true&output=csv";
 
     fetch(csvUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
-        }
-        return response.text();
-      })
+      .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(text => {
         const rows = parseCSV(text);
-        if (!rows || rows.length === 0) {
-          throw new Error("Evaluation CSV file is empty or could not be parsed.");
-        }
-
+        if (!rows || rows.length === 0) throw new Error("Evaluation CSV is empty or unparseable.");
         evaluationRows = rows;
-        applyFilters(); // re-apply filters so Overview & Evaluation table refresh
+        applyFilters();
       })
       .catch(err => {
-        console.error("Error loading Evaluation CSV:", err);
+        console.error("Evaluation CSV error:", err);
         const tbody = document.getElementById('evaluation-body');
         if (tbody) {
-          tbody.innerHTML = "";
-          const tr = document.createElement('tr');
-          const td = document.createElement('td');
-          td.colSpan = 4;
-          td.textContent = "Error loading evaluation data: " + err.message;
-          tr.appendChild(td);
-          tbody.appendChild(tr);
+          tbody.innerHTML = "<tr><td colspan='6'>Error loading evaluation data: " + err.message + "</td></tr>";
         }
       });
   }
 
-  // Very simple CSV parser (works if no commas inside cells)
+  // Simple CSV parser
   function parseCSV(text) {
     const lines = text.trim().split("\n");
     return lines.map(line => line.split(","));
@@ -1135,9 +708,7 @@
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
-    function onChange() {
-      applyFilters();
-    }
+    function onChange() { applyFilters(); }
 
     if (projSel) projSel.addEventListener('change', onChange);
     if (periodSel) periodSel.addEventListener('change', onChange);
@@ -1150,7 +721,7 @@
     if (!monitoringRows.length) return;
 
     const headerRow = monitoringRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
 
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
@@ -1169,38 +740,29 @@
     const periods = new Set();
     const locations = new Set();
 
-    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
 
     dataRows.forEach(row => {
-      if (idxProject !== -1 && row[idxProject]) {
-        projects.add(row[idxProject].trim());
-      }
-      if (idxPeriod !== -1 && row[idxPeriod]) {
-        periods.add(row[idxPeriod].trim());
-      }
-      if (idxLocation !== -1 && row[idxLocation]) {
-        locations.add(row[idxLocation].trim());
-      }
+      if (idxProject !== -1 && row[idxProject]) projects.add(String(row[idxProject]).trim());
+      if (idxPeriod !== -1 && row[idxPeriod]) periods.add(String(row[idxPeriod]).trim());
+      if (idxLocation !== -1 && row[idxLocation]) locations.add(String(row[idxLocation]).trim());
     });
 
     function refillSelect(select, values, currentVal) {
-      const oldVal = currentVal;
       select.innerHTML = "";
       const allOpt = document.createElement('option');
       allOpt.value = "";
       allOpt.textContent = "All";
       select.appendChild(allOpt);
+
       Array.from(values).sort().forEach(v => {
         const opt = document.createElement('option');
         opt.value = v;
         opt.textContent = v;
         select.appendChild(opt);
       });
-      if (oldVal && values.has(oldVal)) {
-        select.value = oldVal;
-      } else {
-        select.value = "";
-      }
+
+      select.value = (currentVal && values.has(currentVal)) ? currentVal : "";
     }
 
     refillSelect(projSel, projects, currentProj);
@@ -1209,13 +771,9 @@
   }
 
   function applyFilters() {
-    const projSel = document.getElementById('filter-project');
-    const periodSel = document.getElementById('filter-period');
-    const locSel = document.getElementById('filter-location');
-
-    const project = projSel ? projSel.value : "";
-    const period = periodSel ? periodSel.value : "";
-    const location = locSel ? locSel.value : "";
+    const project = document.getElementById('filter-project')?.value || "";
+    const period = document.getElementById('filter-period')?.value || "";
+    const location = document.getElementById('filter-location')?.value || "";
 
     monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);
     evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
@@ -1231,60 +789,53 @@
     updateReportsCard(monitorForView);
     updateCharts(monitorForView);
 
-    // ✅ NEW: update Monitoring summary charts under Live CSV Feed
+    // ✅ Monitoring charts (period/month)
     updateMonitoringSummaryCharts(monitorForView);
 
-    // ✅ NEW: update Evaluation charts
-    updateEvaluationCharts(evalForView);
+    // ✅ NEW: Evaluation overall rating calculations + chart
+    updateEvaluationKPIsAndChart(evalForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
     if (!allRows.length || allRows.length <= 1) return [];
 
-    const headerRow = allRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
-
+    const headersLower = allRows[0].map(h => (h || "").trim().toLowerCase());
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
     const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => c.trim() === "")) return false;
-      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
-      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
-      const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
+      if (row.every(c => String(c || "").trim() === "")) return false;
+      const p = idxProject !== -1 ? String(row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? String(row[idxPeriod] || '').trim() : '';
+      const loc = idxLocation !== -1 ? String(row[idxLocation] || '').trim() : '';
 
-      const matchProj = project ? p === project : true;
-      const matchPer = period ? per === period : true;
-      const matchLoc = location ? loc === location : true;
-      return matchProj && matchPer && matchLoc;
+      return (project ? p === project : true)
+          && (period ? per === period : true)
+          && (location ? loc === location : true);
     });
 
-    if (!filteredDataRows.length) return [];
-    return [headerRow].concat(filteredDataRows);
+    return filteredDataRows.length ? [allRows[0]].concat(filteredDataRows) : [];
   }
 
   function filterEvaluationRows(allRows, project, period) {
     if (!allRows.length || allRows.length <= 1) return [];
 
-    const headerRow = allRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+    const headersLower = allRows[0].map(h => (h || "").trim().toLowerCase());
 
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
 
     const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => c.trim() === "")) return false;
-      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
-      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
+      if (row.every(c => String(c || "").trim() === "")) return false;
+      const p = idxProject !== -1 ? String(row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? String(row[idxPeriod] || '').trim() : '';
 
-      const matchProj = project ? p === project : true;
-      const matchPer = period ? per === period : true;
-      return matchProj && matchPer;
+      return (project ? p === project : true)
+          && (period ? per === period : true);
     });
 
-    if (!filteredDataRows.length) return [];
-    return [headerRow].concat(filteredDataRows);
+    return filteredDataRows.length ? [allRows[0]].concat(filteredDataRows) : [];
   }
 
   // ===== TABLE RENDERERS =====
@@ -1297,26 +848,20 @@
     tbody.innerHTML = "";
 
     if (!rows || !rows.length) {
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 4;
-      td.textContent = "No monitoring records found for current filter selection.";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
+      tbody.innerHTML = "<tr><td colspan='6'>No monitoring records found for current filter selection.</td></tr>";
       return;
     }
 
     // Header row
-    const headerRow = document.createElement('tr');
+    const headerTr = document.createElement('tr');
     rows[0].forEach(cell => {
       const th = document.createElement('th');
       th.textContent = cell;
-      headerRow.appendChild(th);
+      headerTr.appendChild(th);
     });
-    thead.appendChild(headerRow);
+    thead.appendChild(headerTr);
 
-    // Identify rating columns by header name (lowercase)
-    const headerNames = rows[0].map(h => h.trim().toLowerCase());
+    const headerNames = rows[0].map(h => (h || "").trim().toLowerCase());
     const ratingHeaders = [
       "activity implementation on schedule",
       "budget utilization as planned",
@@ -1325,43 +870,32 @@
       "coordination with partners"
     ];
     const ratingIndices = [];
-
-    headerNames.forEach((name, idx) => {
-      ratingHeaders.forEach(target => {
-        if (name === target) {
-          ratingIndices.push(idx);
-        }
-      });
-    });
+    headerNames.forEach((name, idx) => { if (ratingHeaders.includes(name)) ratingIndices.push(idx); });
 
     // Data rows
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => c.trim() === "")) continue;
+      if (row.every(c => String(c || "").trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
       row.forEach((cell, idx) => {
         const td = document.createElement('td');
-        const text = cell.trim();
+        const text = String(cell || "").trim();
         td.textContent = text;
 
-        // Apply colours if this column is one of the rating indices
         if (ratingIndices.includes(idx) && text !== "") {
           const value = parseFloat(text);
           if (!isNaN(value)) {
-            if (value >= 4) {
-              td.classList.add("status-good");   // 4–5
-            } else if (value <= 2) {
-              td.classList.add("status-bad");    // 1–2
-            } else if (value === 3) {
-              td.classList.add("status-warn");   // 3
-            }
+            if (value >= 4) td.classList.add("status-good");
+            else if (value <= 2) td.classList.add("status-bad");
+            else if (value === 3) td.classList.add("status-warn");
           }
         }
 
         tr.appendChild(td);
       });
+
       tbody.appendChild(tr);
     }
   }
@@ -1375,90 +909,75 @@
     tbody.innerHTML = "";
 
     if (!rows || !rows.length) {
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 4;
-      td.textContent = "No evaluation records found for current filter selection.";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
+      tbody.innerHTML = "<tr><td colspan='6'>No evaluation records found for current filter selection.</td></tr>";
       return;
     }
 
     // Header row
-    const headerRow = document.createElement('tr');
+    const headerTr = document.createElement('tr');
     rows[0].forEach(cell => {
       const th = document.createElement('th');
       th.textContent = cell;
-      headerRow.appendChild(th);
+      headerTr.appendChild(th);
     });
-    thead.appendChild(headerRow);
+    thead.appendChild(headerTr);
 
-    // Find rating column (header contains 'rating')
-    const headerNames = rows[0].map(h => h.trim().toLowerCase());
+    // Pick first column containing "rating" for coloring (keeps your old behavior)
+    const headerNames = rows[0].map(h => (h || "").trim().toLowerCase());
     let ratingIndex = -1;
     headerNames.forEach((name, idx) => {
-      if (name.includes("rating") && ratingIndex === -1) {
-        ratingIndex = idx;
-      }
+      if (name.includes("rating") && ratingIndex === -1) ratingIndex = idx;
     });
 
     // Data rows
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => c.trim() === "")) continue;
+      if (row.every(c => String(c || "").trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
       row.forEach((cell, idx) => {
         const td = document.createElement('td');
-        const text = cell.trim();
+        const text = String(cell || "").trim();
         td.textContent = text;
 
-        // Apply colours if this is the rating column
         if (ratingIndex === idx && text !== "") {
           const value = parseFloat(text);
           if (!isNaN(value)) {
-            if (value >= 4) {
-              td.classList.add("status-good");   // 4–5
-            } else if (value <= 2) {
-              td.classList.add("status-bad");    // 1–2
-            } else if (value === 3) {
-              td.classList.add("status-warn");   // 3
-            }
+            if (value >= 4) td.classList.add("status-good");
+            else if (value <= 2) td.classList.add("status-bad");
+            else if (value === 3) td.classList.add("status-warn");
           }
         }
 
         tr.appendChild(td);
       });
+
       tbody.appendChild(tr);
     }
   }
 
-  // ===== KPI / CARD HELPERS =====
+  // ===== HELPERS =====
   function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
   }
 
+  function averageByIndex(rows, idx) {
+    if (!rows || rows.length <= 1 || idx < 0) return 0;
+    let sum = 0, count = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const v = parseFloat(rows[i][idx]);
+      if (!isNaN(v)) { sum += v; count++; }
+    }
+    return count ? sum / count : 0;
+  }
+
   function averageFieldFromRows(rows, headerRow, headerNameLower) {
     if (!rows.length || !headerRow.length) return 0;
-    const headers = headerRow.map(h => h.trim().toLowerCase());
+    const headers = headerRow.map(h => (h || "").trim().toLowerCase());
     const idx = headers.indexOf(headerNameLower);
-    if (idx === -1) return 0;
-
-    let sum = 0;
-    let count = 0;
-
-    for (let i = 1; i < rows.length; i++) {
-      const cell = rows[i][idx];
-      const v = parseFloat(cell);
-      if (!isNaN(v)) {
-        sum += v;
-        count++;
-      }
-    }
-
-    return count ? sum / count : 0;
+    return idx === -1 ? 0 : averageByIndex(rows, idx);
   }
 
   // ===== OVERVIEW CARD =====
@@ -1466,7 +985,7 @@
     if (!monitorRows || !monitorRows.length) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
 
     const idxProject = headersLower.indexOf('project name');
     const idxBenef   = headersLower.indexOf('number of beneficiaries reached this period.');
@@ -1479,13 +998,10 @@
 
     for (let i = 1; i < monitorRows.length; i++) {
       const row = monitorRows[i];
-      if (row.every(c => c.trim() === "")) continue;
-
+      if (row.every(c => String(c || "").trim() === "")) continue;
       monCount++;
 
-      if (idxProject !== -1 && row[idxProject]) {
-        projectSet.add(row[idxProject].trim());
-      }
+      if (idxProject !== -1 && row[idxProject]) projectSet.add(String(row[idxProject]).trim());
 
       if (idxBenef !== -1 && row[idxBenef] !== undefined) {
         const b = parseFloat(row[idxBenef]);
@@ -1496,17 +1012,10 @@
     const totalMonitoring = monCount;
     const totalEvaluation = evalRows && evalRows.length > 1 ? (evalRows.length - 1) : 0;
 
-    const avgActivity = idxAct !== -1
-      ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule')
-      : 0;
+    const avgActivity = idxAct !== -1 ? averageByIndex(monitorRows, idxAct) : 0;
+    const avgBudget   = idxBud !== -1 ? averageByIndex(monitorRows, idxBud) : 0;
 
-    const avgBudget = idxBud !== -1
-      ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned')
-      : 0;
-
-    const overallScore = (avgActivity || avgBudget)
-      ? ((avgActivity + avgBudget) / 2).toFixed(1)
-      : "0";
+    const overallScore = (avgActivity || avgBudget) ? ((avgActivity + avgBudget) / 2).toFixed(1) : "0";
 
     setText('ov-total-projects', projectSet.size);
     setText('ov-total-monitoring', totalMonitoring);
@@ -1519,13 +1028,12 @@
   function updateLearningCard(monitorRows) {
     const list = document.getElementById('learning-list');
     if (!list) return;
-
     list.innerHTML = "";
 
     if (!monitorRows || !monitorRows.length) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
 
     const idxProject    = headersLower.indexOf('project name');
     const idxPeriod     = headersLower.indexOf('reporting period');
@@ -1533,26 +1041,21 @@
     const idxChallenges = headersLower.indexOf('key challenges / risks');
     const idxActions    = headersLower.indexOf('immediate actions required / recommendations');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
     const recent = dataRows.slice(-6).reverse();
 
     recent.forEach(row => {
-      const li = document.createElement('li');
-
       const project = idxProject !== -1 ? (row[idxProject] || '') : '';
-      const period  = idxPeriod  !== -1 ? (row[idxPeriod]  || '') : '';
+      const per     = idxPeriod  !== -1 ? (row[idxPeriod]  || '') : '';
+      const ach     = idxAchieve !== -1 ? (row[idxAchieve] || '') : '';
+      const chal    = idxChallenges !== -1 ? (row[idxChallenges] || '') : '';
+      const act     = idxActions !== -1 ? (row[idxActions] || '') : '';
 
-      const ach  = idxAchieve    !== -1 ? (row[idxAchieve]    || '') : '';
-      const chal = idxChallenges !== -1 ? (row[idxChallenges] || '') : '';
-      const act  = idxActions    !== -1 ? (row[idxActions]    || '') : '';
-
-      li.innerHTML = `
-        <strong>${project}</strong> – ${period}<br>
-        ✅ ${ach}<br>
-        ⚠️ ${chal}<br>
-        📌 ${act}
-      `;
-
+      const li = document.createElement('li');
+      li.style.marginBottom = "10px";
+      li.style.paddingBottom = "8px";
+      li.style.borderBottom = "1px solid #eee";
+      li.innerHTML = `<strong>${project}</strong> – ${per}<br>✅ ${ach}<br>⚠️ ${chal}<br>📌 ${act}`;
       list.appendChild(li);
     });
   }
@@ -1561,89 +1064,67 @@
   function updateReportsCard(monitorRows) {
     if (!monitorRows || !monitorRows.length) return;
 
-    const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
-
+    const headersLower = monitorRows[0].map(h => (h || "").trim().toLowerCase());
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxDate   = headersLower.indexOf('reporting date');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
-    const totalReports = dataRows.length;
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+    setText('rep-total', dataRows.length);
 
     let latestPeriod = 'N/A';
     let latestDate   = 'N/A';
 
-    if (dataRows.length > 0) {
+    if (dataRows.length) {
       const lastRow = dataRows[dataRows.length - 1];
       if (idxPeriod !== -1) latestPeriod = lastRow[idxPeriod] || 'N/A';
-      if (idxDate   !== -1) latestDate   = lastRow[idxDate]   || 'N/A';
+      if (idxDate !== -1)   latestDate = lastRow[idxDate] || 'N/A';
     }
 
-    setText('rep-total', totalReports);
     setText('rep-period', latestPeriod);
     setText('rep-date', latestDate);
   }
 
-  // ===== CHARTS =====
+  // ===== OVERVIEW CHARTS =====
   function updateCharts(monitorRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
-
-    if (!monitorRows || !monitorRows.length || !ctx1 || !ctx2) return;
+    if (!monitorRows || monitorRows.length <= 1 || !ctx1 || !ctx2) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => h.trim().toLowerCase());
+    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
 
-    const idxAct    = headersLower.indexOf('activity implementation on schedule');
-    const idxBud    = headersLower.indexOf('budget utilization as planned');
-    const idxStaff  = headersLower.indexOf('staff availability');
-    const idxComm   = headersLower.indexOf('community participation');
-    const idxCoord  = headersLower.indexOf('coordination with partners');
+    const idxAct   = headersLower.indexOf('activity implementation on schedule');
+    const idxBud   = headersLower.indexOf('budget utilization as planned');
+    const idxStaff = headersLower.indexOf('staff availability');
+    const idxComm  = headersLower.indexOf('community participation');
+    const idxCoord = headersLower.indexOf('coordination with partners');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxBenef  = headersLower.indexOf('number of beneficiaries reached this period.');
 
-    // Chart 1: Average ratings
-    const avgActivity = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'activity implementation on schedule') : 0;
-    const avgBudget   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'budget utilization as planned') : 0;
-    const avgStaff    = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'staff availability') : 0;
-    const avgComm     = idxComm  !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'community participation') : 0;
-    const avgCoord    = idxCoord !== -1 ? averageFieldFromRows(monitorRows, headerRow, 'coordination with partners') : 0;
+    const avgActivity = idxAct !== -1 ? averageByIndex(monitorRows, idxAct) : 0;
+    const avgBudget   = idxBud !== -1 ? averageByIndex(monitorRows, idxBud) : 0;
+    const avgStaff    = idxStaff !== -1 ? averageByIndex(monitorRows, idxStaff) : 0;
+    const avgComm     = idxComm !== -1 ? averageByIndex(monitorRows, idxComm) : 0;
+    const avgCoord    = idxCoord !== -1 ? averageByIndex(monitorRows, idxCoord) : 0;
 
     const ratingLabels = ['Activity', 'Budget', 'Staff', 'Community', 'Coordination'];
-    const theRatingData = [avgActivity, avgBudget, avgStaff, avgComm, avgCoord];
+    const ratingData = [avgActivity, avgBudget, avgStaff, avgComm, avgCoord];
 
     if (avgRatingsChart) avgRatingsChart.destroy();
     avgRatingsChart = new Chart(ctx1, {
       type: 'bar',
-      data: {
-        labels: ratingLabels,
-        datasets: [{
-          label: 'Average Rating (1–5)',
-          data: theRatingData
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            suggestedMax: 5
-          }
-        }
-      }
+      data: { labels: ratingLabels, datasets: [{ label: 'Average Rating (1–5)', data: ratingData }] },
+      options: { responsive: true, scales: { y: { beginAtZero: true, suggestedMax: 5 } } }
     });
 
-    // Chart 2: Beneficiaries by period
     const periodMap = new Map();
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
-
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
     dataRows.forEach(row => {
       if (idxPeriod === -1 || idxBenef === -1) return;
-      const per = (row[idxPeriod] || '').trim();
+      const per = String(row[idxPeriod] || '').trim();
       const b = parseFloat(row[idxBenef] || '0');
       if (!per || isNaN(b)) return;
-      const current = periodMap.get(per) || 0;
-      periodMap.set(per, current + b);
+      periodMap.set(per, (periodMap.get(per) || 0) + b);
     });
 
     const periodLabels = Array.from(periodMap.keys());
@@ -1652,39 +1133,19 @@
     if (beneficiariesChart) beneficiariesChart.destroy();
     beneficiariesChart = new Chart(ctx2, {
       type: 'line',
-      data: {
-        labels: periodLabels,
-        datasets: [{
-          label: 'Total Beneficiaries',
-          data: benefData,
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
+      data: { labels: periodLabels, datasets: [{ label: 'Total Beneficiaries', data: benefData, fill: false }] },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
   }
 
   // ===========================
-  // ✅ NEW: Monitoring Summary Charts (Live CSV Feed section)
+  // ✅ Monitoring Summary Charts (period/month)
   // ===========================
-  function safeLower(s) {
-    return (s || "").trim().toLowerCase();
-  }
-
-  // Creates "YYYY-MM" from Reporting Date
   function parseMonthKey(dateStr) {
     if (!dateStr) return "";
     const s = String(dateStr).trim();
     if (!s) return "";
 
-    // Try native parse first
     const d = new Date(s);
     if (!isNaN(d.getTime())) {
       const y = d.getFullYear();
@@ -1692,28 +1153,20 @@
       return `${y}-${m}`;
     }
 
-    // Try MM/DD/YYYY (Google Sheets common)
     const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if (mdy) {
       const mm = String(mdy[1]).padStart(2, "0");
       const yy = mdy[3];
       return `${yy}-${mm}`;
     }
-
     return "";
-  }
-
-  function sortLabels(labels) {
-    return labels.slice().sort((a, b) => a.localeCompare(b));
   }
 
   function setupMonGroupByListener() {
     const sel = document.getElementById("mon-groupby");
     if (!sel) return;
-
     if (sel.dataset.bound === "true") return;
     sel.dataset.bound = "true";
-
     sel.addEventListener("change", () => {
       const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
       updateMonitoringSummaryCharts(monitorForView);
@@ -1733,8 +1186,7 @@
       return;
     }
 
-    const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => safeLower(h));
+    const headersLower = monitorRows[0].map(h => (h || "").trim().toLowerCase());
 
     const idxPeriod = headersLower.indexOf("reporting period");
     const idxDate   = headersLower.indexOf("reporting date");
@@ -1747,8 +1199,6 @@
     const idxCoord  = headersLower.indexOf("coordination with partners");
 
     const groupMode = document.getElementById("mon-groupby")?.value || "period"; // period|month
-
-    // groupKey -> { ratingSum, ratingCount, benefTotal }
     const groups = new Map();
 
     const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
@@ -1757,23 +1207,16 @@
       const dt  = idxDate   !== -1 ? String(row[idxDate] || "").trim()   : "";
       const monthKey = parseMonthKey(dt);
 
-      const key = (groupMode === "month")
-        ? (monthKey || "Unknown Month")
-        : (per || "Unknown Period");
+      const key = (groupMode === "month") ? (monthKey || "Unknown Month") : (per || "Unknown Period");
 
-      if (!groups.has(key)) {
-        groups.set(key, { ratingSum: 0, ratingCount: 0, benefTotal: 0 });
-      }
-
+      if (!groups.has(key)) groups.set(key, { ratingSum: 0, ratingCount: 0, benefTotal: 0 });
       const g = groups.get(key);
 
-      // Beneficiaries total
       if (idxBenef !== -1) {
         const b = parseFloat(row[idxBenef] || "0");
         if (!isNaN(b)) g.benefTotal += b;
       }
 
-      // Overall rating per row = average of all available rating columns
       const vals = [];
       [idxAct, idxBud, idxStaff, idxComm, idxCoord].forEach(idx => {
         if (idx !== -1) {
@@ -1789,115 +1232,127 @@
       }
     });
 
-    const labels = sortLabels(Array.from(groups.keys()));
+    const labels = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b));
     const overallAvg = labels.map(k => {
       const g = groups.get(k);
       return g.ratingCount ? +(g.ratingSum / g.ratingCount).toFixed(2) : 0;
     });
     const benefTotals = labels.map(k => +(groups.get(k).benefTotal || 0).toFixed(0));
 
-    // Chart 1: Overall avg rating by group
     if (monOverallByGroupChart) monOverallByGroupChart.destroy();
     monOverallByGroupChart = new Chart(c1, {
       type: "bar",
       data: {
         labels,
         datasets: [{
-          label: groupMode === "month"
-            ? "Avg Overall Rating by Month (1–5)"
-            : "Avg Overall Rating by Period (1–5)",
+          label: groupMode === "month" ? "Avg Overall Rating by Month (1–5)" : "Avg Overall Rating by Period (1–5)",
           data: overallAvg
         }]
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true, suggestedMax: 5 }
-        }
-      }
+      options: { responsive: true, scales: { y: { beginAtZero: true, suggestedMax: 5 } } }
     });
 
-    // Chart 2: Beneficiaries by group
     if (monBenefByGroupChart) monBenefByGroupChart.destroy();
     monBenefByGroupChart = new Chart(c2, {
       type: "line",
       data: {
         labels,
         datasets: [{
-          label: groupMode === "month"
-            ? "Total Beneficiaries by Month"
-            : "Total Beneficiaries by Period",
+          label: groupMode === "month" ? "Total Beneficiaries by Month" : "Total Beneficiaries by Period",
           data: benefTotals,
           fill: false
         }]
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
   }
 
   // ===========================
-  // ✅ NEW: Evaluation Charts
+  // ✅ NEW: Evaluation KPI Calculations + Chart
   // ===========================
-  function updateEvaluationCharts(evalRows) {
-    const canvas = document.getElementById("eval-chart-ratings");
-    if (!canvas) return;
+  function findIndexSmart(headersLower, includesAll, includesAny = []) {
+    // includesAll: all must be present; includesAny: at least one from list (optional)
+    for (let i = 0; i < headersLower.length; i++) {
+      const h = headersLower[i];
+      const allOk = includesAll.every(x => h.includes(x));
+      const anyOk = includesAny.length ? includesAny.some(x => h.includes(x)) : true;
+      if (allOk && anyOk) return i;
+    }
+    return -1;
+  }
 
+  function formatScoreAndPercent(avgOutOf5) {
+    const score = isNaN(avgOutOf5) ? 0 : avgOutOf5;
+    const pct = Math.max(0, Math.min(100, (score / 5) * 100));
+    return {
+      scoreText: `${score.toFixed(1)} / 5`,
+      pctText: `${pct.toFixed(0)}%`
+    };
+  }
+
+  function updateEvaluationKPIsAndChart(evalRows) {
+    // If no data, reset KPIs
     if (!evalRows || evalRows.length <= 1) {
-      if (evalRatingsChart) {
-        evalRatingsChart.destroy();
-        evalRatingsChart = null;
-      }
+      setText("ev-outcome-score", "0.0 / 5");
+      setText("ev-outcome-percent", "0%");
+      setText("ev-impact-score", "0.0 / 5");
+      setText("ev-impact-percent", "0%");
+      setText("ev-performance-score", "0.0 / 5");
+      setText("ev-performance-percent", "0%");
+
+      if (evOutcomeImpactChart) { evOutcomeImpactChart.destroy(); evOutcomeImpactChart = null; }
       return;
     }
 
-    const headerRow = evalRows[0];
-    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headersLower = evalRows[0].map(h => (h || "").trim().toLowerCase());
 
-    // Find all columns containing "rating"
-    const ratingCols = [];
-    headersLower.forEach((h, idx) => {
-      if (h.includes("rating")) ratingCols.push(idx);
-    });
+    // Try to detect columns robustly (supports different naming styles)
+    // Outcome: "outcome" + "rating"
+    let idxOutcome = findIndexSmart(headersLower, ["outcome"], ["rating", "score"]);
+    if (idxOutcome === -1) idxOutcome = headersLower.indexOf("outcome rating");
+    // Impact: "impact" + "rating"
+    let idxImpact = findIndexSmart(headersLower, ["impact"], ["rating", "score"]);
+    if (idxImpact === -1) idxImpact = headersLower.indexOf("impact rating");
 
-    if (!ratingCols.length) return;
+    const avgOutcome = idxOutcome !== -1 ? averageByIndex(evalRows, idxOutcome) : 0;
+    const avgImpact  = idxImpact  !== -1 ? averageByIndex(evalRows, idxImpact)  : 0;
 
-    const labels = ratingCols.map(i => headerRow[i]);
-    const sums = new Array(ratingCols.length).fill(0);
-    const counts = new Array(ratingCols.length).fill(0);
+    // Overall performance = average of available (outcome + impact) values
+    let perf = 0;
+    if (avgOutcome && avgImpact) perf = (avgOutcome + avgImpact) / 2;
+    else if (avgOutcome) perf = avgOutcome;
+    else if (avgImpact) perf = avgImpact;
 
-    for (let i = 1; i < evalRows.length; i++) {
-      const row = evalRows[i];
-      ratingCols.forEach((colIdx, j) => {
-        const v = parseFloat(row[colIdx]);
-        if (!isNaN(v)) {
-          sums[j] += v;
-          counts[j]++;
-        }
-      });
-    }
+    const outFmt = formatScoreAndPercent(avgOutcome);
+    const impFmt = formatScoreAndPercent(avgImpact);
+    const perFmt = formatScoreAndPercent(perf);
 
-    const avgs = sums.map((s, i) => (counts[i] ? +(s / counts[i]).toFixed(2) : 0));
+    setText("ev-outcome-score", outFmt.scoreText);
+    setText("ev-outcome-percent", outFmt.pctText);
 
-    if (evalRatingsChart) evalRatingsChart.destroy();
-    evalRatingsChart = new Chart(canvas, {
+    setText("ev-impact-score", impFmt.scoreText);
+    setText("ev-impact-percent", impFmt.pctText);
+
+    setText("ev-performance-score", perFmt.scoreText);
+    setText("ev-performance-percent", perFmt.pctText);
+
+    // Chart: Outcome vs Impact averages
+    const ctx = document.getElementById("ev-chart-outcome-impact");
+    if (!ctx) return;
+
+    if (evOutcomeImpactChart) evOutcomeImpactChart.destroy();
+    evOutcomeImpactChart = new Chart(ctx, {
       type: "bar",
       data: {
-        labels,
+        labels: ["Outcome", "Impact", "Overall Performance"],
         datasets: [{
-          label: "Average Evaluation Rating (1–5)",
-          data: avgs
+          label: "Average Rating (1–5)",
+          data: [avgOutcome, avgImpact, perf]
         }]
       },
       options: {
         responsive: true,
-        scales: {
-          y: { beginAtZero: true, suggestedMax: 5 }
-        }
+        scales: { y: { beginAtZero: true, suggestedMax: 5 } }
       }
     });
   }
@@ -1906,19 +1361,15 @@
   function generatePDFReport() {
     try {
       const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-      if (!jsPDF) {
-        alert("PDF library not loaded.");
-        return;
-      }
+      if (!jsPDF) { alert("PDF library not loaded."); return; }
 
       const proj = document.getElementById('ov-total-projects')?.textContent || '0';
-      const mon = document.getElementById('ov-total-monitoring')?.textContent || '0';
-      const evl = document.getElementById('ov-total-evaluation')?.textContent || '0';
-      const ben = document.getElementById('ov-total-beneficiaries')?.textContent || '0';
+      const mon  = document.getElementById('ov-total-monitoring')?.textContent || '0';
+      const evl  = document.getElementById('ov-total-evaluation')?.textContent || '0';
+      const ben  = document.getElementById('ov-total-beneficiaries')?.textContent || '0';
       const score = document.getElementById('ov-overall-score')?.textContent || '0';
 
       const doc = new jsPDF();
-
       doc.setFontSize(14);
       doc.text('ProMEL PMCEL Summary Report', 10, 12);
 
@@ -1930,8 +1381,20 @@
       doc.text('Total Beneficiaries Reached: ' + ben, 10, 48);
       doc.text('Overall Performance Score (Activity & Budget): ' + score, 10, 54);
 
-      doc.text('Generated by ProMEL Analytics Solutions', 10, 70);
+      // Also include evaluation KPIs (new)
+      const outS = document.getElementById('ev-outcome-score')?.textContent || '0.0 / 5';
+      const outP = document.getElementById('ev-outcome-percent')?.textContent || '0%';
+      const impS = document.getElementById('ev-impact-score')?.textContent || '0.0 / 5';
+      const impP = document.getElementById('ev-impact-percent')?.textContent || '0%';
+      const perS = document.getElementById('ev-performance-score')?.textContent || '0.0 / 5';
+      const perP = document.getElementById('ev-performance-percent')?.textContent || '0%';
 
+      doc.text('Evaluation Ratings (from current filters):', 10, 64);
+      doc.text('Outcome: ' + outS + ' (' + outP + ')', 10, 70);
+      doc.text('Impact: ' + impS + ' (' + impP + ')', 10, 76);
+      doc.text('Overall Performance: ' + perS + ' (' + perP + ')', 10, 82);
+
+      doc.text('Generated by ProMEL Analytics Solutions', 10, 98);
       doc.save('ProMEL_PMEL_Report.pdf');
     } catch (e) {
       console.error(e);
@@ -1939,7 +1402,7 @@
     }
   }
 
-  // ===== DATA ENTRY FORMS (DEMO HOOKS) =====
+  // ===== DATA ENTRY FORMS (DEMO) =====
   function setupDataEntryForms() {
     const monForm = document.getElementById('monitoring-entry-form');
     const evalForm = document.getElementById('evaluation-entry-form');
@@ -1959,46 +1422,37 @@
     }
   }
 
-  // ===== AI ASSISTANT (FRONTEND HOOK) =====
+  // ===== AI ASSISTANT (DEMO HOOK) =====
   async function sendToAIAssistant() {
-    const modeEl = document.getElementById('ai-mode');
-    const promptEl = document.getElementById('ai-prompt');
-    const includeFiltersEl = document.getElementById('ai-include-filters');
+    const mode = document.getElementById('ai-mode')?.value || 'custom';
+    const prompt = (document.getElementById('ai-prompt')?.value || '').trim();
+    const includeFilters = document.getElementById('ai-include-filters')?.checked ?? true;
+
     const statusEl = document.getElementById('ai-status');
     const responseBox = document.getElementById('ai-response-box');
 
-    const mode = modeEl ? modeEl.value : 'custom';
-    const prompt = (promptEl ? promptEl.value : '').trim();
-    const includeFilters = includeFiltersEl ? includeFiltersEl.checked : true;
+    if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
 
-    if (!prompt) {
-      alert('Please enter a prompt or question for the AI assistant.');
-      return;
-    }
-
-    // Basic context from filters
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
 
-    // KPI snapshot from DOM
     const kpis = {
       totalProjects: document.getElementById('ov-total-projects')?.textContent || '0',
       totalMonitoring: document.getElementById('ov-total-monitoring')?.textContent || '0',
       totalEvaluation: document.getElementById('ov-total-evaluation')?.textContent || '0',
       totalBeneficiaries: document.getElementById('ov-total-beneficiaries')?.textContent || '0',
-      overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
+      overallScore: document.getElementById('ov-overall-score')?.textContent || '0',
+      evalOutcome: (document.getElementById('ev-outcome-score')?.textContent || '0.0 / 5') + " (" + (document.getElementById('ev-outcome-percent')?.textContent || '0%') + ")",
+      evalImpact: (document.getElementById('ev-impact-score')?.textContent || '0.0 / 5') + " (" + (document.getElementById('ev-impact-percent')?.textContent || '0%') + ")",
+      evalPerformance: (document.getElementById('ev-performance-score')?.textContent || '0.0 / 5') + " (" + (document.getElementById('ev-performance-percent')?.textContent || '0%') + ")"
     };
 
     const payload = {
       mode,
       user_prompt: prompt,
       include_filters: includeFilters,
-      filters: {
-        project,
-        period,
-        location
-      },
+      filters: { project, period, location },
       kpi_snapshot: kpis
     };
 
@@ -2008,22 +1462,18 @@
     try {
       const res = await fetch(AI_API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
-      if (!res.ok) {
-        throw new Error('HTTP ' + res.status + ' from AI backend');
-      }
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' from AI backend');
 
       const data = await res.json();
-      // For httpbin.org/post, the JSON echo will have your payload at data.json
       const echoed = data.json || data;
+
       responseBox.textContent =
         'Demo response from httpbin.org (this is just echoing what you sent):\n\n' +
         JSON.stringify(echoed, null, 2);
+
       statusEl.textContent = 'Demo AI response received.';
     } catch (err) {
       console.error(err);
@@ -2035,3 +1485,5 @@
 
 </body>
 </html>
+
+<body>

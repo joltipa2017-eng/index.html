@@ -660,6 +660,25 @@
         </table>
       </div>
 
+      <!-- ✅ NEW: Monitoring summary graphs (by Period / Month) -->
+      <div class="table-wrapper" style="margin-top:12px;">
+        <div class="info-note" style="margin:6px 4px 10px;">
+          <strong>Monitoring Summary Graphs</strong> (auto from filtered table)
+          &nbsp;|&nbsp;
+          Group by:
+          <select id="mon-groupby" style="padding:4px 6px; border-radius:6px; border:1px solid #ccc;">
+            <option value="period" selected>Reporting Period</option>
+            <option value="month">Month (from Reporting Date)</option>
+          </select>
+        </div>
+
+        <canvas id="mon-chart-overall-by-group"></canvas>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:12px;">
+        <canvas id="mon-chart-beneficiaries-by-group"></canvas>
+      </div>
+
       <div class="legend">
         <strong>Monitoring rating colour key (1–5):</strong>
         <span class="status-bad">1–2 = Off-track / Poor</span>
@@ -941,6 +960,10 @@
   let avgRatingsChart = null;
   let beneficiariesChart = null;
 
+  // ✅ NEW: Monitoring summary charts under Live CSV Feed
+  let monOverallByGroupChart = null;
+  let monBenefByGroupChart = null;
+
   // ===========================
   // LOGIN & INIT
   // ===========================
@@ -1198,6 +1221,9 @@
     updateLearningCard(monitorForView);
     updateReportsCard(monitorForView);
     updateCharts(monitorForView);
+
+    // ✅ NEW: update Monitoring summary charts under Live CSV Feed
+    updateMonitoringSummaryCharts(monitorForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
@@ -1629,6 +1655,175 @@
           y: {
             beginAtZero: true
           }
+        }
+      }
+    });
+  }
+
+  // ===========================
+  // ✅ NEW: Monitoring Summary Charts (Live CSV Feed section)
+  // ===========================
+  function safeLower(s) {
+    return (s || "").trim().toLowerCase();
+  }
+
+  // Creates "YYYY-MM" from Reporting Date
+  function parseMonthKey(dateStr) {
+    if (!dateStr) return "";
+    const s = String(dateStr).trim();
+    if (!s) return "";
+
+    // Try native parse first
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`;
+    }
+
+    // Try MM/DD/YYYY (Google Sheets common)
+    const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (mdy) {
+      const mm = String(mdy[1]).padStart(2, "0");
+      const yy = mdy[3];
+      return `${yy}-${mm}`;
+    }
+
+    return "";
+  }
+
+  function sortLabels(labels) {
+    return labels.slice().sort((a, b) => a.localeCompare(b));
+  }
+
+  function setupMonGroupByListener() {
+    const sel = document.getElementById("mon-groupby");
+    if (!sel) return;
+
+    if (sel.dataset.bound === "true") return;
+    sel.dataset.bound = "true";
+
+    sel.addEventListener("change", () => {
+      const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+      updateMonitoringSummaryCharts(monitorForView);
+    });
+  }
+
+  function updateMonitoringSummaryCharts(monitorRows) {
+    setupMonGroupByListener();
+
+    const c1 = document.getElementById("mon-chart-overall-by-group");
+    const c2 = document.getElementById("mon-chart-beneficiaries-by-group");
+    if (!c1 || !c2) return;
+
+    if (!monitorRows || monitorRows.length <= 1) {
+      if (monOverallByGroupChart) { monOverallByGroupChart.destroy(); monOverallByGroupChart = null; }
+      if (monBenefByGroupChart) { monBenefByGroupChart.destroy(); monBenefByGroupChart = null; }
+      return;
+    }
+
+    const headerRow = monitorRows[0];
+    const headersLower = headerRow.map(h => safeLower(h));
+
+    const idxPeriod = headersLower.indexOf("reporting period");
+    const idxDate   = headersLower.indexOf("reporting date");
+    const idxBenef  = headersLower.indexOf("number of beneficiaries reached this period.");
+
+    const idxAct    = headersLower.indexOf("activity implementation on schedule");
+    const idxBud    = headersLower.indexOf("budget utilization as planned");
+    const idxStaff  = headersLower.indexOf("staff availability");
+    const idxComm   = headersLower.indexOf("community participation");
+    const idxCoord  = headersLower.indexOf("coordination with partners");
+
+    const groupMode = document.getElementById("mon-groupby")?.value || "period"; // period|month
+
+    // groupKey -> { ratingSum, ratingCount, benefTotal }
+    const groups = new Map();
+
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+    dataRows.forEach(row => {
+      const per = idxPeriod !== -1 ? String(row[idxPeriod] || "").trim() : "";
+      const dt  = idxDate   !== -1 ? String(row[idxDate] || "").trim()   : "";
+      const monthKey = parseMonthKey(dt);
+
+      const key = (groupMode === "month")
+        ? (monthKey || "Unknown Month")
+        : (per || "Unknown Period");
+
+      if (!groups.has(key)) {
+        groups.set(key, { ratingSum: 0, ratingCount: 0, benefTotal: 0 });
+      }
+
+      const g = groups.get(key);
+
+      // Beneficiaries total
+      if (idxBenef !== -1) {
+        const b = parseFloat(row[idxBenef] || "0");
+        if (!isNaN(b)) g.benefTotal += b;
+      }
+
+      // Overall rating per row = average of all available rating columns
+      const vals = [];
+      [idxAct, idxBud, idxStaff, idxComm, idxCoord].forEach(idx => {
+        if (idx !== -1) {
+          const v = parseFloat(row[idx] || "");
+          if (!isNaN(v)) vals.push(v);
+        }
+      });
+
+      if (vals.length) {
+        const rowAvg = vals.reduce((a, x) => a + x, 0) / vals.length;
+        g.ratingSum += rowAvg;
+        g.ratingCount += 1;
+      }
+    });
+
+    const labels = sortLabels(Array.from(groups.keys()));
+    const overallAvg = labels.map(k => {
+      const g = groups.get(k);
+      return g.ratingCount ? +(g.ratingSum / g.ratingCount).toFixed(2) : 0;
+    });
+    const benefTotals = labels.map(k => +(groups.get(k).benefTotal || 0).toFixed(0));
+
+    // Chart 1: Overall avg rating by group
+    if (monOverallByGroupChart) monOverallByGroupChart.destroy();
+    monOverallByGroupChart = new Chart(c1, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: groupMode === "month"
+            ? "Avg Overall Rating by Month (1–5)"
+            : "Avg Overall Rating by Period (1–5)",
+          data: overallAvg
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, suggestedMax: 5 }
+        }
+      }
+    });
+
+    // Chart 2: Beneficiaries by group
+    if (monBenefByGroupChart) monBenefByGroupChart.destroy();
+    monBenefByGroupChart = new Chart(c2, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: groupMode === "month"
+            ? "Total Beneficiaries by Month"
+            : "Total Beneficiaries by Period",
+          data: benefTotals,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
         }
       }
     });

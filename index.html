@@ -443,7 +443,6 @@
     <div id="filters-bar" class="filters-bar">
       <strong>Filters:</strong>
 
-      <!-- ✅ UPDATED: Rename filter label + ID to match “Implementing Agency / Organization” -->
       <label>
         Implementing Agency / Organization:
         <select id="filter-organization">
@@ -470,7 +469,6 @@
         </select>
       </label>
 
-      <!-- ✅ NEW: Data load status line -->
       <span id="data-status" class="info-note" style="margin-left:auto;">
         Data status: not loaded yet.
       </span>
@@ -529,7 +527,6 @@
         Filters at the top (Project, Period, Location) adjust the figures below.
       </p>
 
-      <!-- EXISTING OVERVIEW KPIs -->
       <div class="kpi-grid">
         <div class="kpi-box">
           <div class="kpi-label">Total Projects</div>
@@ -553,7 +550,6 @@
         </div>
       </div>
 
-      <!-- ✅ NEW: OVERVIEW KPI TRAFFIC-LIGHT SUMMARY -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">High Level Project Performance (Traffic-light, auto from filtered data)</strong>
 
@@ -619,7 +615,6 @@
         also reduce this table to the selected project/period/location.
       </p>
 
-      <!-- Monitoring KPI Summary -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">Monitoring KPIs (Traffic-light, auto from filtered data)</strong>
 
@@ -676,7 +671,6 @@
         </table>
       </div>
 
-      <!-- Monitoring Summary Graphs -->
       <div class="table-wrapper" style="margin-top:12px;">
         <div class="info-note" style="margin:6px 4px 10px;">
           <strong>Monitoring Summary Graphs</strong> (auto from filtered table)
@@ -934,14 +928,10 @@
   </footer>
 </div>
 
-<!-- External libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-  // ===========================
-  // CONFIG: BACKEND AI ENDPOINT (DEMO)
-  // ===========================
   const AI_API_URL = "https://httpbin.org/post";
 
   let monitoringRows = [];
@@ -958,19 +948,14 @@
 
   let evalRatingsChart = null;
 
-  // KPI traffic-light charts
   let monKpiBarChart = null;
   let monKpiDonutChart = null;
   let evalKpiBarChart = null;
   let evalKpiDonutChart = null;
 
-  // ✅ NEW: Overview traffic-light charts
   let ovKpiBarChart = null;
   let ovKpiDonutChart = null;
 
-  // ===========================
-  // ✅ NEW: DATA STATUS + CSV SANITY CHECK
-  // ===========================
   function setStatus(msg) {
     const el = document.getElementById("data-status");
     if (el) el.textContent = msg;
@@ -985,9 +970,14 @@
     return false;
   }
 
-  // ===========================
-  // LOGIN & INIT
-  // ===========================
+  // ✅ NEW: normalize ALL filter comparisons (fixes dropdown-specific “no visuals” bug)
+  function norm(s) {
+    return String(s || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const loginScreen = document.getElementById('login-screen');
     const appRoot = document.getElementById('app-root');
@@ -1029,11 +1019,7 @@
     setupFilterListeners();
     setupDataEntryForms();
     setupAutoRefresh();
-
-    // ✅ bind Monitoring "Group by" once at init (safe, idempotent)
     setupMonGroupByListener();
-
-    // ✅ NEW: show something immediately after login
     openSection("overview");
   }
 
@@ -1044,7 +1030,6 @@
     }, 60000);
   }
 
-  // ✅ UPDATED: openSection now refreshes charts/KPIs when the section becomes visible.
   function openSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     const el = document.getElementById(id);
@@ -1100,10 +1085,8 @@
     if (el) el.style.display = 'none';
   }
 
-  // ===== CSV LOADERS =====
   function loadMonitoringTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?gid=1298321526&single=true&output=csv";
-
     setStatus("Loading Monitoring CSV...");
 
     fetch(csvUrl, { cache: "no-store" })
@@ -1147,7 +1130,6 @@
 
   function loadEvaluationTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd_zFcgy_c_5JDgK9wTVFLi5WeHTPF4uQBq9cOPl8vurc2DVu3DWrqwXiE1FmGcL5f2TtWjWLlGs1L/pub?gid=1608876672&single=true&output=csv";
-
     setStatus("Loading Evaluation CSV...");
 
     fetch(csvUrl, { cache: "no-store" })
@@ -1188,7 +1170,6 @@
       });
   }
 
-  // CSV parser (handles commas inside quotes)
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -1237,18 +1218,17 @@
     return rows.map(r => r.map(c => (c === undefined ? "" : String(c))));
   }
 
-  // ===== FILTERS =====
   function setupFilterListeners() {
     if (filtersInitialized) return;
 
-    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
+    const orgSel = document.getElementById('filter-organization');
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
     function onChange() { applyFilters(); }
 
-    if (orgSel) orgSel.addEventListener('change', onChange); // ✅ UPDATED
+    if (orgSel) orgSel.addEventListener('change', onChange);
     if (projSel) projSel.addEventListener('change', onChange);
     if (periodSel) periodSel.addEventListener('change', onChange);
     if (locSel) locSel.addEventListener('change', onChange);
@@ -1262,12 +1242,12 @@
     const headerRow = monitoringRows[0];
     const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxOrg = headersLower.indexOf('implementing agency / organization'); // ✅ MATCHES SHEET HEADER
+    const idxOrg = headersLower.indexOf('implementing agency / organization');
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
-    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
+    const orgSel = document.getElementById('filter-organization');
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
@@ -1316,15 +1296,10 @@
   }
 
   function applyFilters() {
-    const orgSel = document.getElementById('filter-organization'); // ✅ UPDATED
-    const projSel = document.getElementById('filter-project');
-    const periodSel = document.getElementById('filter-period');
-    const locSel = document.getElementById('filter-location');
-
-    const organization = orgSel ? orgSel.value : "";
-    const project = projSel ? projSel.value : "";
-    const period = periodSel ? periodSel.value : "";
-    const location = locSel ? locSel.value : "";
+    const organization = document.getElementById('filter-organization')?.value || "";
+    const project = document.getElementById('filter-project')?.value || "";
+    const period = document.getElementById('filter-period')?.value || "";
+    const location = document.getElementById('filter-location')?.value || "";
 
     monitoringFilteredRows = filterMonitoringRows(monitoringRows, organization, project, period, location);
     evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
@@ -1346,10 +1321,10 @@
     updateMonitoringKPIs(monitorForView);
     updateEvaluationKPIs(evalForView);
 
-    // ✅ Overview traffic-light KPIs + charts
     updateOverviewKPIs(monitorForView, evalForView);
   }
 
+  // ✅ FIXED: normalize comparisons for ALL filters (Org + Project + Period + Location)
   function filterMonitoringRows(allRows, organization, project, period, location) {
     if (!allRows.length || allRows.length <= 1) return [];
 
@@ -1361,20 +1336,23 @@
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxLocation = headersLower.indexOf('province / district / location');
 
-    const norm = s => String(s || '').trim().replace(/\s+/g,' ').toLowerCase();
+    const fOrg = norm(organization);
+    const fProj = norm(project);
+    const fPer = norm(period);
+    const fLoc = norm(location);
 
     const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => c.trim() === "")) return false;
+      if (row.every(c => String(c || "").trim() === "")) return false;
 
-      const o = idxOrg !== -1 ? (row[idxOrg] || '').trim() : '';
-      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
-      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
-      const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
+      const o = idxOrg !== -1 ? norm(row[idxOrg]) : '';
+      const p = idxProject !== -1 ? norm(row[idxProject]) : '';
+      const per = idxPeriod !== -1 ? norm(row[idxPeriod]) : '';
+      const loc = idxLocation !== -1 ? norm(row[idxLocation]) : '';
 
-      const matchOrg = organization ? norm(o) === norm(organization) : true;
-      const matchProj = project ? p === project : true;
-      const matchPer = period ? per === period : true;
-      const matchLoc = location ? loc === location : true;
+      const matchOrg = fOrg ? o === fOrg : true;
+      const matchProj = fProj ? p === fProj : true;
+      const matchPer = fPer ? per === fPer : true;
+      const matchLoc = fLoc ? loc === fLoc : true;
 
       return matchOrg && matchProj && matchPer && matchLoc;
     });
@@ -1392,13 +1370,17 @@
     const idxProject = headersLower.indexOf('project name');
     const idxPeriod = headersLower.indexOf('reporting period');
 
-    const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => c.trim() === "")) return false;
-      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
-      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
+    const fProj = norm(project);
+    const fPer = norm(period);
 
-      const matchProj = project ? p === project : true;
-      const matchPer = period ? per === period : true;
+    const filteredDataRows = allRows.slice(1).filter(row => {
+      if (row.every(c => String(c || "").trim() === "")) return false;
+
+      const p = idxProject !== -1 ? norm(row[idxProject]) : '';
+      const per = idxPeriod !== -1 ? norm(row[idxPeriod]) : '';
+
+      const matchProj = fProj ? p === fProj : true;
+      const matchPer = fPer ? per === fPer : true;
       return matchProj && matchPer;
     });
 
@@ -1406,7 +1388,6 @@
     return [headerRow].concat(filteredDataRows);
   }
 
-  // ===== TABLE RENDERERS =====
   function renderMonitoringTable(rows) {
     const thead = document.getElementById('monitoring-head');
     const tbody = document.getElementById('monitoring-body');
@@ -1418,7 +1399,7 @@
     if (!rows || !rows.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 4;
+      td.colSpan = 99;
       td.textContent = "No monitoring records found for current filter selection.";
       tr.appendChild(td);
       tbody.appendChild(tr);
@@ -1451,7 +1432,7 @@
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => c.trim() === "")) continue;
+      if (row.every(c => String(c || "").trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
@@ -1486,7 +1467,7 @@
     if (!rows || !rows.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 4;
+      td.colSpan = 99;
       td.textContent = "No evaluation records found for current filter selection.";
       tr.appendChild(td);
       tbody.appendChild(tr);
@@ -1509,7 +1490,7 @@
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => c.trim() === "")) continue;
+      if (row.every(c => String(c || "").trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
@@ -1533,7 +1514,6 @@
     }
   }
 
-  // ===== KPI / CARD HELPERS =====
   function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
@@ -1557,7 +1537,6 @@
     return count ? sum / count : 0;
   }
 
-  // ===== OVERVIEW CARD (existing counters) =====
   function updateOverviewCard(monitorRows, evalRows) {
     if (!monitorRows || !monitorRows.length) return;
 
@@ -1575,7 +1554,7 @@
 
     for (let i = 1; i < monitorRows.length; i++) {
       const row = monitorRows[i];
-      if (row.every(c => c.trim() === "")) continue;
+      if (row.every(c => String(c || "").trim() === "")) continue;
 
       monCount++;
 
@@ -1609,7 +1588,6 @@
     setText('ov-overall-score', overallScore);
   }
 
-  // ===== LEARNING CARD =====
   function updateLearningCard(monitorRows) {
     const list = document.getElementById('learning-list');
     if (!list) return;
@@ -1626,7 +1604,7 @@
     const idxChallenges = headersLower.indexOf('key challenges / risks');
     const idxActions    = headersLower.indexOf('immediate actions required / recommendations');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
     const recent = dataRows.slice(-6).reverse();
 
     recent.forEach(row => {
@@ -1649,7 +1627,6 @@
     });
   }
 
-  // ===== REPORTS CARD =====
   function updateReportsCard(monitorRows) {
     if (!monitorRows || !monitorRows.length) return;
 
@@ -1659,7 +1636,7 @@
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxDate   = headersLower.indexOf('reporting date');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
     const totalReports = dataRows.length;
 
     let latestPeriod = 'N/A';
@@ -1676,7 +1653,6 @@
     setText('rep-date', latestDate);
   }
 
-  // ===== CHARTS (Overview charts) =====
   function updateCharts(monitorRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
@@ -1720,7 +1696,7 @@
     });
 
     const periodMap = new Map();
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
 
     dataRows.forEach(row => {
       if (idxPeriod === -1 || idxBenef === -1) return;
@@ -1752,9 +1728,6 @@
     });
   }
 
-  // ===========================
-  // Monitoring Summary Charts
-  // ===========================
   function safeLower(s) {
     return (s || "").trim().toLowerCase();
   }
@@ -1907,9 +1880,6 @@
     });
   }
 
-  // ===========================
-  // Evaluation Charts
-  // ===========================
   function updateEvaluationCharts(evalRows) {
     const canvas = document.getElementById("eval-chart-ratings");
     if (!canvas) return;
@@ -1960,9 +1930,6 @@
     });
   }
 
-  // ===========================
-  // Traffic-light KPI Engine
-  // ===========================
   function getCssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
@@ -2000,7 +1967,6 @@
     return getCssVar("--status-bad");
   }
 
-  // ----- Monitoring KPIs -----
   function updateMonitoringKPIs(monitorRows) {
     const barCanvas = document.getElementById("mon-kpi-bar");
     const donutCanvas = document.getElementById("mon-kpi-donut");
@@ -2119,7 +2085,6 @@
     });
   }
 
-  // ----- Evaluation KPIs -----
   function updateEvaluationKPIs(evalRows) {
     const barCanvas = document.getElementById("eval-kpi-bar");
     const donutCanvas = document.getElementById("eval-kpi-donut");
@@ -2236,7 +2201,6 @@
     });
   }
 
-  // ✅ Overview KPIs (Monitoring + Evaluation + Combined)
   function updateOverviewKPIs(monitorRows, evalRows) {
     const barCanvas = document.getElementById("ov-kpi-bar");
     const donutCanvas = document.getElementById("ov-kpi-donut");
@@ -2401,7 +2365,6 @@
     });
   }
 
-  // ===== PDF REPORT =====
   function generatePDFReport() {
     try {
       const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
@@ -2435,7 +2398,6 @@
     }
   }
 
-  // ===== DATA ENTRY FORMS (DEMO HOOKS) =====
   function setupDataEntryForms() {
     const monForm = document.getElementById('monitoring-entry-form');
     const evalForm = document.getElementById('evaluation-entry-form');
@@ -2455,7 +2417,6 @@
     }
   }
 
-  // ===== AI ASSISTANT (FRONTEND HOOK) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
     const promptEl = document.getElementById('ai-prompt');

@@ -258,7 +258,7 @@
     .kpi-label { font-size: 0.75rem; color: #555; margin-bottom: 4px; }
     .kpi-value { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
 
-    /* KPI traffic-light boxes (Monitoring + Evaluation) */
+    /* KPI traffic-light boxes (Monitoring + Evaluation + Overview) */
     .kpi-box.kpi-good { background: var(--kpi-good-bg); border: 1px solid rgba(10, 122, 41, 0.25); }
     .kpi-box.kpi-warn { background: var(--kpi-warn-bg); border: 1px solid rgba(184, 134, 11, 0.28); }
     .kpi-box.kpi-bad  { background: var(--kpi-bad-bg);  border: 1px solid rgba(178, 34, 34, 0.25); }
@@ -515,6 +515,7 @@
         Filters at the top (Project, Period, Location) adjust the figures below.
       </p>
 
+      <!-- EXISTING OVERVIEW KPIs -->
       <div class="kpi-grid">
         <div class="kpi-box">
           <div class="kpi-label">Total Projects</div>
@@ -538,6 +539,52 @@
         </div>
       </div>
 
+      <!-- ✅ NEW: OVERVIEW KPI TRAFFIC-LIGHT SUMMARY -->
+      <div class="table-wrapper" style="margin-top:12px; padding:10px;">
+        <strong style="font-size:0.85rem;">High Level Project Performance (Traffic-light, auto from filtered data)</strong>
+
+        <div class="kpi-grid" style="margin-top:10px;">
+          <div class="kpi-box" id="ov-kpi-monitoring-box">
+            <div class="kpi-label">Monitoring Overall</div>
+            <div class="kpi-value" id="ov-kpi-monitoring">0%</div>
+          </div>
+          <div class="kpi-box" id="ov-kpi-evalperf-box">
+            <div class="kpi-label">Evaluation Performance</div>
+            <div class="kpi-value" id="ov-kpi-evalperf">0%</div>
+          </div>
+          <div class="kpi-box" id="ov-kpi-outcome-box">
+            <div class="kpi-label">Outcome</div>
+            <div class="kpi-value" id="ov-kpi-outcome">0%</div>
+          </div>
+          <div class="kpi-box" id="ov-kpi-impact-box">
+            <div class="kpi-label">Impact</div>
+            <div class="kpi-value" id="ov-kpi-impact">0%</div>
+          </div>
+          <div class="kpi-box" id="ov-kpi-combined-box">
+            <div class="kpi-label">Combined Project Performance</div>
+            <div class="kpi-value" id="ov-kpi-combined">0%</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid" style="margin-top:6px;">
+          <div class="table-wrapper" style="margin:0; padding:8px;">
+            <strong style="font-size:0.8rem;">Performance KPI % Summary</strong>
+            <canvas id="ov-kpi-bar"></canvas>
+          </div>
+          <div class="table-wrapper" style="margin:0; padding:8px;">
+            <strong style="font-size:0.8rem;">Overall Distribution (Monitoring + Evaluation)</strong>
+            <canvas id="ov-kpi-donut"></canvas>
+          </div>
+        </div>
+
+        <div class="legend" style="margin-top:10px;">
+          <strong>Traffic-light key:</strong>
+          <span class="status-bad">0–40% Off-track / Poor</span>
+          <span class="status-warn">41–60% Moderate / Watch</span>
+          <span class="status-good">61–100% On-track / Good</span>
+        </div>
+      </div>
+
       <div class="table-wrapper" style="margin-top:12px;">
         <canvas id="chart-avg-ratings"></canvas>
       </div>
@@ -558,7 +605,7 @@
         also reduce this table to the selected project/period/location.
       </p>
 
-      <!-- ✅ NEW: Monitoring KPI Summary (Traffic-light) -->
+      <!-- Monitoring KPI Summary -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">Monitoring KPIs (Traffic-light, auto from filtered data)</strong>
 
@@ -615,7 +662,7 @@
         </table>
       </div>
 
-      <!-- ✅ NEW: Monitoring summary graphs (by Period / Month) -->
+      <!-- Monitoring Summary Graphs -->
       <div class="table-wrapper" style="margin-top:12px;">
         <div class="info-note" style="margin:6px 4px 10px;">
           <strong>Monitoring Summary Graphs</strong> (auto from filtered table)
@@ -656,7 +703,6 @@
         Filters at the top adjust this table as well.
       </p>
 
-      <!-- ✅ NEW: Evaluation KPI Summary (Traffic-light) -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">Evaluation KPIs (Traffic-light, auto from filtered data)</strong>
 
@@ -705,7 +751,6 @@
         </table>
       </div>
 
-      <!-- ✅ NEW: Evaluation Summary Chart -->
       <div class="table-wrapper" style="margin-top:12px;">
         <strong style="font-size:0.85rem;">Evaluation Summary – Average Ratings</strong>
         <canvas id="eval-chart-ratings"></canvas>
@@ -885,7 +930,6 @@
   // ===========================
   const AI_API_URL = "https://httpbin.org/post";
 
-  // Global data arrays (include header row)
   let monitoringRows = [];
   let evaluationRows = [];
   let monitoringFilteredRows = [];
@@ -895,18 +939,20 @@
   let avgRatingsChart = null;
   let beneficiariesChart = null;
 
-  // Monitoring summary charts under Live CSV Feed
   let monOverallByGroupChart = null;
   let monBenefByGroupChart = null;
 
-  // Evaluation charts
   let evalRatingsChart = null;
 
-  // ✅ NEW: KPI traffic-light charts
+  // KPI traffic-light charts
   let monKpiBarChart = null;
   let monKpiDonutChart = null;
   let evalKpiBarChart = null;
   let evalKpiDonutChart = null;
+
+  // ✅ NEW: Overview traffic-light charts
+  let ovKpiBarChart = null;
+  let ovKpiDonutChart = null;
 
   // ===========================
   // LOGIN & INIT
@@ -932,8 +978,6 @@
         e.preventDefault();
         const user = document.getElementById('login-username').value.trim();
         const pass = document.getElementById('login-password').value.trim();
-
-        console.log('Login attempt:', { user, passLength: pass.length });
 
         if (user === 'admin' && pass === 'ProMEL@2025') {
           localStorage.setItem('promelLoggedIn', 'true');
@@ -962,7 +1006,6 @@
     }, 60000);
   }
 
-  // Show/Hide sections
   function openSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     const el = document.getElementById(id);
@@ -1039,7 +1082,7 @@
       });
   }
 
-  // ✅ Improved CSV parser (handles commas inside quotes)
+  // CSV parser (handles commas inside quotes)
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -1184,9 +1227,11 @@
     updateMonitoringSummaryCharts(monitorForView);
     updateEvaluationCharts(evalForView);
 
-    // ✅ NEW: Traffic-light KPI calculations + charts
     updateMonitoringKPIs(monitorForView);
     updateEvaluationKPIs(evalForView);
+
+    // ✅ NEW: Overview traffic-light KPIs + charts
+    updateOverviewKPIs(monitorForView, evalForView);
   }
 
   function filterMonitoringRows(allRows, project, period, location) {
@@ -1389,7 +1434,7 @@
     return count ? sum / count : 0;
   }
 
-  // ===== OVERVIEW CARD =====
+  // ===== OVERVIEW CARD (existing counters) =====
   function updateOverviewCard(monitorRows, evalRows) {
     if (!monitorRows || !monitorRows.length) return;
 
@@ -1508,7 +1553,7 @@
     setText('rep-date', latestDate);
   }
 
-  // ===== CHARTS =====
+  // ===== CHARTS (Overview charts) =====
   function updateCharts(monitorRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
@@ -1793,7 +1838,7 @@
   }
 
   // ===========================
-  // ✅ NEW: Traffic-light KPI Engine
+  // Traffic-light KPI Engine
   // ===========================
   function getCssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -1895,9 +1940,7 @@
     applyKpiStatus("mon-kpi-coordination-box", "mon-kpi-coordination", pctCoord);
     applyKpiStatus("mon-kpi-overall-box", "mon-kpi-overall", pctOverall);
 
-    // Distribution donut based on row-level overall rating (1–2 bad, 3 warn, 4–5 good)
     let cntBad = 0, cntWarn = 0, cntGood = 0;
-
     dataRows.forEach(row => {
       const vals = [];
       [idxAct, idxBud, idxStaff, idxComm, idxCoord].forEach(idx => {
@@ -1914,7 +1957,6 @@
       else cntWarn++;
     });
 
-    // Bar chart KPI %
     const barLabels = ["Activity", "Budget", "Staff", "Community", "Coordination", "Overall"];
     const barData = [pctActivity, pctBudget, pctStaff, pctComm, pctCoord, pctOverall];
     const barColors = barData.map(p => chartColorForPercent(p));
@@ -1932,13 +1974,10 @@
       },
       options: {
         responsive: true,
-        scales: {
-          y: { beginAtZero: true, max: 100 }
-        }
+        scales: { y: { beginAtZero: true, max: 100 } }
       }
     });
 
-    // Donut chart distribution
     if (monKpiDonutChart) monKpiDonutChart.destroy();
     monKpiDonutChart = new Chart(donutCanvas, {
       type: "doughnut",
@@ -1977,22 +2016,18 @@
     const headerRow = evalRows[0];
     const headersLower = headerRow.map(h => safeLower(h));
 
-    // Flexible matching
     const idxOutcome = headersLower.findIndex(h => h.includes("outcome") && h.includes("rating"));
     const idxImpact  = headersLower.findIndex(h => h.includes("impact") && h.includes("rating"));
 
-    // Performance column: try explicit (overall/performance) first, else fallback to first "rating"
     let idxPerf = headersLower.findIndex(h => (h.includes("overall") || h.includes("performance")) && h.includes("rating"));
     if (idxPerf === -1) idxPerf = headersLower.findIndex(h => h.includes("rating"));
 
     const dataRows = evalRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
     setText("ev-kpi-records", String(dataRows.length));
 
-    // Compute averages (1–5)
     const avgOutcome = idxOutcome !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxOutcome]) : 0;
     const avgImpact  = idxImpact  !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxImpact])  : 0;
 
-    // Performance avg: if missing, use avg of outcome+impact if available, else 0
     let avgPerf = 0;
     if (idxPerf !== -1) {
       avgPerf = averageFieldFromRows(evalRows, headerRow, headersLower[idxPerf]);
@@ -2001,8 +2036,6 @@
       avgPerf = tmp.length ? (tmp.reduce((a, x) => a + x, 0) / tmp.length) : 0;
     }
 
-    // If perf exists but looks like it's a duplicate "rating" column that isn't overall, still ok.
-    // Convert to percent
     const pctOutcome = Math.round(percentFromRating(avgOutcome));
     const pctImpact  = Math.round(percentFromRating(avgImpact));
     const pctPerf    = Math.round(percentFromRating(avgPerf));
@@ -2015,17 +2048,12 @@
     applyKpiStatus("ev-kpi-impact-box", "ev-kpi-impact", pctImpact);
     applyKpiStatus("ev-kpi-performance-box", "ev-kpi-performance", pctPerf);
 
-    // Distribution donut based on performance rating (1–2 bad, 3 warn, 4–5 good)
     let cntBad = 0, cntWarn = 0, cntGood = 0;
 
     dataRows.forEach(row => {
       let perfVal = NaN;
+      if (idxPerf !== -1) perfVal = parseFloat(row[idxPerf] || "");
 
-      if (idxPerf !== -1) {
-        perfVal = parseFloat(row[idxPerf] || "");
-      }
-
-      // If no perf, approximate with outcome+impact
       if (isNaN(perfVal)) {
         const vals = [];
         if (idxOutcome !== -1) {
@@ -2046,7 +2074,6 @@
       else cntWarn++;
     });
 
-    // KPI bar chart
     const barLabels = ["Outcome", "Impact", "Performance"];
     const barData = [pctOutcome, pctImpact, pctPerf];
     const barColors = barData.map(p => chartColorForPercent(p));
@@ -2068,7 +2095,6 @@
       }
     });
 
-    // KPI donut chart
     if (evalKpiDonutChart) evalKpiDonutChart.destroy();
     evalKpiDonutChart = new Chart(donutCanvas, {
       type: "doughnut",
@@ -2076,6 +2102,180 @@
         labels: ["Off-track / Poor", "Moderate / Watch", "On-track / Good"],
         datasets: [{
           data: [cntBad, cntWarn, cntGood],
+          backgroundColor: [
+            getCssVar("--status-bad"),
+            getCssVar("--status-warn"),
+            getCssVar("--status-good")
+          ]
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+
+  // ✅ NEW: Overview KPIs (Monitoring + Evaluation + Combined)
+  function updateOverviewKPIs(monitorRows, evalRows) {
+    const barCanvas = document.getElementById("ov-kpi-bar");
+    const donutCanvas = document.getElementById("ov-kpi-donut");
+    if (!barCanvas || !donutCanvas) return;
+
+    // --- Monitoring overall % (from monitoring rows)
+    let monOverallPct = 0;
+    let monBad = 0, monWarn = 0, monGood = 0;
+
+    if (monitorRows && monitorRows.length > 1) {
+      const headerRow = monitorRows[0];
+      const headersLower = headerRow.map(h => safeLower(h));
+
+      const idxAct   = headersLower.indexOf("activity implementation on schedule");
+      const idxBud   = headersLower.indexOf("budget utilization as planned");
+      const idxStaff = headersLower.indexOf("staff availability");
+      const idxComm  = headersLower.indexOf("community participation");
+      const idxCoord = headersLower.indexOf("coordination with partners");
+
+      const avgAct   = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, "activity implementation on schedule") : 0;
+      const avgBud   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, "budget utilization as planned") : 0;
+      const avgStaff = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, "staff availability") : 0;
+      const avgComm  = idxComm  !== -1 ? averageFieldFromRows(monitorRows, headerRow, "community participation") : 0;
+      const avgCoord = idxCoord !== -1 ? averageFieldFromRows(monitorRows, headerRow, "coordination with partners") : 0;
+
+      const pcts = [
+        Math.round(percentFromRating(avgAct)),
+        Math.round(percentFromRating(avgBud)),
+        Math.round(percentFromRating(avgStaff)),
+        Math.round(percentFromRating(avgComm)),
+        Math.round(percentFromRating(avgCoord))
+      ].filter(p => p > 0);
+
+      monOverallPct = pcts.length ? Math.round(pcts.reduce((a, x) => a + x, 0) / pcts.length) : 0;
+
+      // Distribution counts (row-level)
+      const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+      dataRows.forEach(row => {
+        const vals = [];
+        [idxAct, idxBud, idxStaff, idxComm, idxCoord].forEach(idx => {
+          if (idx !== -1) {
+            const v = parseFloat(row[idx] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+        });
+        if (!vals.length) return;
+        const rowAvg = vals.reduce((a, x) => a + x, 0) / vals.length;
+        if (rowAvg >= 4) monGood++;
+        else if (rowAvg <= 2) monBad++;
+        else monWarn++;
+      });
+    }
+
+    // --- Evaluation outcome/impact/performance % and distribution counts
+    let evOutcomePct = 0, evImpactPct = 0, evPerfPct = 0;
+    let evBad = 0, evWarn = 0, evGood = 0;
+
+    if (evalRows && evalRows.length > 1) {
+      const headerRow = evalRows[0];
+      const headersLower = headerRow.map(h => safeLower(h));
+
+      const idxOutcome = headersLower.findIndex(h => h.includes("outcome") && h.includes("rating"));
+      const idxImpact  = headersLower.findIndex(h => h.includes("impact") && h.includes("rating"));
+      let idxPerf = headersLower.findIndex(h => (h.includes("overall") || h.includes("performance")) && h.includes("rating"));
+      if (idxPerf === -1) idxPerf = headersLower.findIndex(h => h.includes("rating"));
+
+      const avgOutcome = idxOutcome !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxOutcome]) : 0;
+      const avgImpact  = idxImpact  !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxImpact])  : 0;
+
+      let avgPerf = 0;
+      if (idxPerf !== -1) {
+        avgPerf = averageFieldFromRows(evalRows, headerRow, headersLower[idxPerf]);
+      } else {
+        const tmp = [avgOutcome, avgImpact].filter(x => x > 0);
+        avgPerf = tmp.length ? (tmp.reduce((a, x) => a + x, 0) / tmp.length) : 0;
+      }
+
+      evOutcomePct = Math.round(percentFromRating(avgOutcome));
+      evImpactPct  = Math.round(percentFromRating(avgImpact));
+      evPerfPct    = Math.round(percentFromRating(avgPerf));
+
+      const dataRows = evalRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+      dataRows.forEach(row => {
+        let perfVal = NaN;
+        if (idxPerf !== -1) perfVal = parseFloat(row[idxPerf] || "");
+
+        if (isNaN(perfVal)) {
+          const vals = [];
+          if (idxOutcome !== -1) {
+            const v = parseFloat(row[idxOutcome] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+          if (idxImpact !== -1) {
+            const v = parseFloat(row[idxImpact] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+          if (vals.length) perfVal = vals.reduce((a, x) => a + x, 0) / vals.length;
+        }
+
+        if (isNaN(perfVal)) return;
+
+        if (perfVal >= 4) evGood++;
+        else if (perfVal <= 2) evBad++;
+        else evWarn++;
+      });
+    }
+
+    // --- Combined Project Performance %
+    // Use average of (Monitoring Overall, Evaluation Performance) if both exist; else whichever exists.
+    const comboParts = [];
+    if (monOverallPct > 0) comboParts.push(monOverallPct);
+    if (evPerfPct > 0) comboParts.push(evPerfPct);
+    const combinedPct = comboParts.length ? Math.round(comboParts.reduce((a, x) => a + x, 0) / comboParts.length) : 0;
+
+    // Update KPI texts
+    setText("ov-kpi-monitoring", monOverallPct + "%");
+    setText("ov-kpi-evalperf", evPerfPct + "%");
+    setText("ov-kpi-outcome", evOutcomePct + "%");
+    setText("ov-kpi-impact", evImpactPct + "%");
+    setText("ov-kpi-combined", combinedPct + "%");
+
+    // Apply status styling
+    applyKpiStatus("ov-kpi-monitoring-box", "ov-kpi-monitoring", monOverallPct);
+    applyKpiStatus("ov-kpi-evalperf-box", "ov-kpi-evalperf", evPerfPct);
+    applyKpiStatus("ov-kpi-outcome-box", "ov-kpi-outcome", evOutcomePct);
+    applyKpiStatus("ov-kpi-impact-box", "ov-kpi-impact", evImpactPct);
+    applyKpiStatus("ov-kpi-combined-box", "ov-kpi-combined", combinedPct);
+
+    // Bar chart
+    const barLabels = ["Monitoring", "Evaluation", "Outcome", "Impact", "Combined"];
+    const barData = [monOverallPct, evPerfPct, evOutcomePct, evImpactPct, combinedPct];
+    const barColors = barData.map(p => chartColorForPercent(p));
+
+    if (ovKpiBarChart) ovKpiBarChart.destroy();
+    ovKpiBarChart = new Chart(barCanvas, {
+      type: "bar",
+      data: {
+        labels: barLabels,
+        datasets: [{
+          label: "High Level KPI Score (%)",
+          data: barData,
+          backgroundColor: barColors
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+
+    // Doughnut chart (combined distribution counts)
+    const totalBad = monBad + evBad;
+    const totalWarn = monWarn + evWarn;
+    const totalGood = monGood + evGood;
+
+    if (ovKpiDonutChart) ovKpiDonutChart.destroy();
+    ovKpiDonutChart = new Chart(donutCanvas, {
+      type: "doughnut",
+      data: {
+        labels: ["Off-track / Poor", "Moderate / Watch", "On-track / Good"],
+        datasets: [{
+          data: [totalBad, totalWarn, totalGood],
           backgroundColor: [
             getCssVar("--status-bad"),
             getCssVar("--status-warn"),

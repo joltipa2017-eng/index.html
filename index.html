@@ -442,14 +442,6 @@
     <!-- Filters -->
     <div id="filters-bar" class="filters-bar">
       <strong>Filters:</strong>
-
-      <label>
-        Implementing Agency / Organization:
-        <select id="filter-organization">
-          <option value="">All</option>
-        </select>
-      </label>
-
       <label>
         Project:
         <select id="filter-project">
@@ -468,10 +460,6 @@
           <option value="">All</option>
         </select>
       </label>
-
-      <span id="data-status" class="info-note" style="margin-left:auto;">
-        Data status: not loaded yet.
-      </span>
     </div>
 
     <!-- Navigation cards -->
@@ -527,6 +515,7 @@
         Filters at the top (Project, Period, Location) adjust the figures below.
       </p>
 
+      <!-- EXISTING OVERVIEW KPIs -->
       <div class="kpi-grid">
         <div class="kpi-box">
           <div class="kpi-label">Total Projects</div>
@@ -550,6 +539,7 @@
         </div>
       </div>
 
+      <!-- ✅ NEW: OVERVIEW KPI TRAFFIC-LIGHT SUMMARY -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">High Level Project Performance (Traffic-light, auto from filtered data)</strong>
 
@@ -615,6 +605,7 @@
         also reduce this table to the selected project/period/location.
       </p>
 
+      <!-- Monitoring KPI Summary -->
       <div class="table-wrapper" style="margin-top:12px; padding:10px;">
         <strong style="font-size:0.85rem;">Monitoring KPIs (Traffic-light, auto from filtered data)</strong>
 
@@ -671,6 +662,7 @@
         </table>
       </div>
 
+      <!-- Monitoring Summary Graphs -->
       <div class="table-wrapper" style="margin-top:12px;">
         <div class="info-note" style="margin:6px 4px 10px;">
           <strong>Monitoring Summary Graphs</strong> (auto from filtered table)
@@ -928,10 +920,14 @@
   </footer>
 </div>
 
+<!-- External libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+  // ===========================
+  // CONFIG: BACKEND AI ENDPOINT (DEMO)
+  // ===========================
   const AI_API_URL = "https://httpbin.org/post";
 
   let monitoringRows = [];
@@ -948,43 +944,19 @@
 
   let evalRatingsChart = null;
 
+  // KPI traffic-light charts
   let monKpiBarChart = null;
   let monKpiDonutChart = null;
   let evalKpiBarChart = null;
   let evalKpiDonutChart = null;
 
+  // ✅ NEW: Overview traffic-light charts
   let ovKpiBarChart = null;
   let ovKpiDonutChart = null;
 
-  function setStatus(msg) {
-    const el = document.getElementById("data-status");
-    if (el) el.textContent = msg;
-  }
-
-  function looksLikeHtmlNotCsv(text) {
-    const t = (text || "").trim();
-    if (!t) return true;
-    if (t.startsWith("<!DOCTYPE html") || t.startsWith("<html")) return true;
-    if (t.toLowerCase().includes("google sheets") && t.toLowerCase().includes("cookies")) return true;
-    if (t.toLowerCase().includes("sign in") && t.toLowerCase().includes("accounts.google.com")) return true;
-    return false;
-  }
-
-  // ✅ UPDATED: strong normalization (removes hidden chars + NBSP + normalizes spaces)
-  function norm(s) {
-    return String(s || "")
-      .replace(/[\u200B-\u200D\uFEFF]/g, "")  // zero-width chars
-      .replace(/\u00A0/g, " ")               // NBSP -> space
-      .trim()
-      .replace(/\s+/g, " ")
-      .toLowerCase();
-  }
-
-  // ✅ NEW: helper to find header index by required words (flexible header matching)
-  function findHeaderIndex(headersLower, requiredWords) {
-    return headersLower.findIndex(h => requiredWords.every(w => (h || "").includes(w)));
-  }
-
+  // ===========================
+  // LOGIN & INIT
+  // ===========================
   document.addEventListener('DOMContentLoaded', function () {
     const loginScreen = document.getElementById('login-screen');
     const appRoot = document.getElementById('app-root');
@@ -1020,14 +992,11 @@
   });
 
   function initApp() {
-    setStatus("Loading Monitoring + Evaluation data...");
     loadMonitoringTable();
     loadEvaluationTable();
     setupFilterListeners();
     setupDataEntryForms();
     setupAutoRefresh();
-    setupMonGroupByListener();
-    openSection("overview");
   }
 
   function setupAutoRefresh() {
@@ -1043,47 +1012,6 @@
     if (el) {
       el.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      setTimeout(() => {
-        try {
-          if (id === "monitoring") {
-            const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
-            updateMonitoringKPIs(monitorForView);
-            updateMonitoringSummaryCharts(monitorForView);
-            updateCharts(monitorForView);
-          }
-
-          if (id === "evaluation") {
-            const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
-            updateEvaluationKPIs(evalForView);
-            updateEvaluationCharts(evalForView);
-          }
-
-          if (id === "overview") {
-            const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
-            const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
-            updateOverviewCard(monitorForView, evalForView);
-            updateOverviewKPIs(monitorForView, evalForView);
-            updateCharts(monitorForView);
-          }
-
-          const charts = [
-            avgRatingsChart, beneficiariesChart,
-            monOverallByGroupChart, monBenefByGroupChart,
-            evalRatingsChart,
-            monKpiBarChart, monKpiDonutChart,
-            evalKpiBarChart, evalKpiDonutChart,
-            ovKpiBarChart, ovKpiDonutChart
-          ];
-
-          charts.forEach(ch => {
-            if (ch && typeof ch.resize === "function") ch.resize();
-            if (ch && typeof ch.update === "function") ch.update();
-          });
-        } catch (e) {
-          console.error("Chart refresh error:", e);
-        }
-      }, 120);
     }
   }
 
@@ -1092,42 +1020,31 @@
     if (el) el.style.display = 'none';
   }
 
+  // ===== CSV LOADERS =====
   function loadMonitoringTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKiND_eb3gPR0spQHucadf14xH_rX5gRtpHShan_OWJqSThbHrcx8tqCa4V_3nXjqq3duum0i6XCSE/pub?gid=1298321526&single=true&output=csv";
-    setStatus("Loading Monitoring CSV...");
 
-    fetch(csvUrl, { cache: "no-store" })
+    fetch(csvUrl)
       .then(response => {
-        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching Monitoring CSV");
+        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
         return response.text();
       })
       .then(text => {
-        if (looksLikeHtmlNotCsv(text)) {
-          throw new Error(
-            "Monitoring link is NOT returning CSV. It looks like an HTML consent/access page. " +
-            "Fix: In Google Sheets -> File -> Share -> Publish to the web -> CSV, then use that published CSV link."
-          );
-        }
-
         const rows = parseCSV(text);
-        if (!rows || rows.length <= 1) throw new Error("Monitoring CSV parsed but has no data rows.");
+        if (!rows || rows.length === 0) throw new Error("Monitoring CSV file is empty or could not be parsed.");
 
         monitoringRows = rows;
         buildMonitoringFilters();
         applyFilters();
-
-        setStatus("Monitoring loaded. Loading Evaluation...");
       })
       .catch(err => {
         console.error("Error loading Monitoring CSV:", err);
-        setStatus("Monitoring error: " + err.message);
-
         const tbody = document.getElementById('monitoring-body');
         if (tbody) {
           tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
-          td.colSpan = 99;
+          td.colSpan = 4;
           td.textContent = "Error loading monitoring data: " + err.message;
           tr.appendChild(td);
           tbody.appendChild(tr);
@@ -1137,39 +1054,27 @@
 
   function loadEvaluationTable() {
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd_zFcgy_c_5JDgK9wTVFLi5WeHTPF4uQBq9cOPl8vurc2DVu3DWrqwXiE1FmGcL5f2TtWjWLlGs1L/pub?gid=1608876672&single=true&output=csv";
-    setStatus("Loading Evaluation CSV...");
 
-    fetch(csvUrl, { cache: "no-store" })
+    fetch(csvUrl)
       .then(response => {
-        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching Evaluation CSV");
+        if (!response.ok) throw new Error("HTTP " + response.status + " when fetching " + csvUrl);
         return response.text();
       })
       .then(text => {
-        if (looksLikeHtmlNotCsv(text)) {
-          throw new Error(
-            "Evaluation link is NOT returning CSV. It looks like an HTML consent/access page. " +
-            "Fix: In Google Sheets -> File -> Share -> Publish to the web -> CSV, then use that published CSV link."
-          );
-        }
-
         const rows = parseCSV(text);
-        if (!rows || rows.length <= 1) throw new Error("Evaluation CSV parsed but has no data rows.");
+        if (!rows || rows.length === 0) throw new Error("Evaluation CSV file is empty or could not be parsed.");
 
         evaluationRows = rows;
         applyFilters();
-
-        setStatus("Monitoring + Evaluation loaded successfully.");
       })
       .catch(err => {
         console.error("Error loading Evaluation CSV:", err);
-        setStatus("Evaluation error: " + err.message);
-
         const tbody = document.getElementById('evaluation-body');
         if (tbody) {
           tbody.innerHTML = "";
           const tr = document.createElement('tr');
           const td = document.createElement('td');
-          td.colSpan = 99;
+          td.colSpan = 4;
           td.textContent = "Error loading evaluation data: " + err.message;
           tr.appendChild(td);
           tbody.appendChild(tr);
@@ -1177,6 +1082,7 @@
       });
   }
 
+  // CSV parser (handles commas inside quotes)
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -1225,17 +1131,16 @@
     return rows.map(r => r.map(c => (c === undefined ? "" : String(c))));
   }
 
+  // ===== FILTERS =====
   function setupFilterListeners() {
     if (filtersInitialized) return;
 
-    const orgSel = document.getElementById('filter-organization');
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
 
     function onChange() { applyFilters(); }
 
-    if (orgSel) orgSel.addEventListener('change', onChange);
     if (projSel) projSel.addEventListener('change', onChange);
     if (periodSel) periodSel.addEventListener('change', onChange);
     if (locSel) locSel.addEventListener('change', onChange);
@@ -1247,94 +1152,65 @@
     if (!monitoringRows.length) return;
 
     const headerRow = monitoringRows[0];
-    const headersLower = headerRow.map(h => norm(h)); // use norm here for robust matching
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    // ✅ Flexible column detection (works even if header text changes slightly)
-    const idxOrg = (findHeaderIndex(headersLower, ["implementing", "agency"]) !== -1)
-      ? findHeaderIndex(headersLower, ["implementing", "agency"])
-      : findHeaderIndex(headersLower, ["organization"]);
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxLocation = headersLower.indexOf('province / district / location');
 
-    const idxProject = (findHeaderIndex(headersLower, ["project", "name"]) !== -1)
-      ? findHeaderIndex(headersLower, ["project", "name"])
-      : headersLower.indexOf("project name");
-
-    const idxPeriod = (findHeaderIndex(headersLower, ["reporting", "period"]) !== -1)
-      ? findHeaderIndex(headersLower, ["reporting", "period"])
-      : headersLower.indexOf("reporting period");
-
-    const idxLocation = (findHeaderIndex(headersLower, ["province"]) !== -1)
-      ? findHeaderIndex(headersLower, ["province"])
-      : (findHeaderIndex(headersLower, ["district"]) !== -1 ? findHeaderIndex(headersLower, ["district"]) : headersLower.indexOf("province / district / location"));
-
-    const orgSel = document.getElementById('filter-organization');
     const projSel = document.getElementById('filter-project');
     const periodSel = document.getElementById('filter-period');
     const locSel = document.getElementById('filter-location');
-    if (!orgSel || !projSel || !periodSel || !locSel) return;
+    if (!projSel || !periodSel || !locSel) return;
 
-    const currentOrg = orgSel.value;
     const currentProj = projSel.value;
     const currentPeriod = periodSel.value;
     const currentLoc = locSel.value;
 
-    // ✅ Map normalized -> display value (prevents duplicates caused by hidden chars)
-    const orgMap = new Map();
-    const projectMap = new Map();
-    const periodMap = new Map();
-    const locationMap = new Map();
+    const projects = new Set();
+    const periods = new Set();
+    const locations = new Set();
 
-    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
-
-    function addToMap(map, raw) {
-      const display = String(raw || "").trim();
-      if (!display) return;
-      const key = norm(display);
-      if (!key) return;
-      if (!map.has(key)) map.set(key, display);
-    }
+    const dataRows = monitoringRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
     dataRows.forEach(row => {
-      if (idxOrg !== -1 && row[idxOrg] !== undefined) addToMap(orgMap, row[idxOrg]);
-      if (idxProject !== -1 && row[idxProject] !== undefined) addToMap(projectMap, row[idxProject]);
-      if (idxPeriod !== -1 && row[idxPeriod] !== undefined) addToMap(periodMap, row[idxPeriod]);
-      if (idxLocation !== -1 && row[idxLocation] !== undefined) addToMap(locationMap, row[idxLocation]);
+      if (idxProject !== -1 && row[idxProject]) projects.add(row[idxProject].trim());
+      if (idxPeriod !== -1 && row[idxPeriod]) periods.add(row[idxPeriod].trim());
+      if (idxLocation !== -1 && row[idxLocation]) locations.add(row[idxLocation].trim());
     });
 
-    function refillSelect(select, map, currentVal) {
+    function refillSelect(select, values, currentVal) {
       const oldVal = currentVal;
       select.innerHTML = "";
       const allOpt = document.createElement('option');
       allOpt.value = "";
       allOpt.textContent = "All";
       select.appendChild(allOpt);
-
-      // sort by display value
-      const items = Array.from(map.values()).sort((a, b) => a.localeCompare(b));
-      items.forEach(v => {
+      Array.from(values).sort().forEach(v => {
         const opt = document.createElement('option');
         opt.value = v;
         opt.textContent = v;
         select.appendChild(opt);
       });
-
-      // re-select if still exists
-      const stillExists = items.includes(oldVal);
-      select.value = stillExists ? oldVal : "";
+      if (oldVal && values.has(oldVal)) select.value = oldVal;
+      else select.value = "";
     }
 
-    refillSelect(orgSel, orgMap, currentOrg);
-    refillSelect(projSel, projectMap, currentProj);
-    refillSelect(periodSel, periodMap, currentPeriod);
-    refillSelect(locSel, locationMap, currentLoc);
+    refillSelect(projSel, projects, currentProj);
+    refillSelect(periodSel, periods, currentPeriod);
+    refillSelect(locSel, locations, currentLoc);
   }
 
   function applyFilters() {
-    const organization = document.getElementById('filter-organization')?.value || "";
-    const project = document.getElementById('filter-project')?.value || "";
-    const period = document.getElementById('filter-period')?.value || "";
-    const location = document.getElementById('filter-location')?.value || "";
+    const projSel = document.getElementById('filter-project');
+    const periodSel = document.getElementById('filter-period');
+    const locSel = document.getElementById('filter-location');
 
-    monitoringFilteredRows = filterMonitoringRows(monitoringRows, organization, project, period, location);
+    const project = projSel ? projSel.value : "";
+    const period = periodSel ? periodSel.value : "";
+    const location = locSel ? locSel.value : "";
+
+    monitoringFilteredRows = filterMonitoringRows(monitoringRows, project, period, location);
     evaluationFilteredRows = filterEvaluationRows(evaluationRows, project, period);
 
     const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
@@ -1354,53 +1230,30 @@
     updateMonitoringKPIs(monitorForView);
     updateEvaluationKPIs(evalForView);
 
+    // ✅ NEW: Overview traffic-light KPIs + charts
     updateOverviewKPIs(monitorForView, evalForView);
   }
 
-  // ✅ FIXED: Organization now uses flexible column detection + contains-match
-  function filterMonitoringRows(allRows, organization, project, period, location) {
+  function filterMonitoringRows(allRows, project, period, location) {
     if (!allRows.length || allRows.length <= 1) return [];
 
     const headerRow = allRows[0];
-    const headersLower = headerRow.map(h => norm(h));
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxOrg = (findHeaderIndex(headersLower, ["implementing", "agency"]) !== -1)
-      ? findHeaderIndex(headersLower, ["implementing", "agency"])
-      : findHeaderIndex(headersLower, ["organization"]);
-
-    const idxProject = (findHeaderIndex(headersLower, ["project", "name"]) !== -1)
-      ? findHeaderIndex(headersLower, ["project", "name"])
-      : headersLower.indexOf("project name");
-
-    const idxPeriod = (findHeaderIndex(headersLower, ["reporting", "period"]) !== -1)
-      ? findHeaderIndex(headersLower, ["reporting", "period"])
-      : headersLower.indexOf("reporting period");
-
-    const idxLocation = (findHeaderIndex(headersLower, ["province"]) !== -1)
-      ? findHeaderIndex(headersLower, ["province"])
-      : (findHeaderIndex(headersLower, ["district"]) !== -1 ? findHeaderIndex(headersLower, ["district"]) : headersLower.indexOf("province / district / location"));
-
-    const fOrg = norm(organization);
-    const fProj = norm(project);
-    const fPer = norm(period);
-    const fLoc = norm(location);
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
+    const idxLocation = headersLower.indexOf('province / district / location');
 
     const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => String(c || "").trim() === "")) return false;
+      if (row.every(c => c.trim() === "")) return false;
+      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
+      const loc = idxLocation !== -1 ? (row[idxLocation] || '').trim() : '';
 
-      const o = idxOrg !== -1 ? norm(row[idxOrg]) : '';
-      const p = idxProject !== -1 ? norm(row[idxProject]) : '';
-      const per = idxPeriod !== -1 ? norm(row[idxPeriod]) : '';
-      const loc = idxLocation !== -1 ? norm(row[idxLocation]) : '';
-
-      // ✅ Key fix: Org matching uses contains (handles extra words like "(DPM)" etc.)
-      const matchOrg = fOrg ? (o.includes(fOrg) || fOrg.includes(o)) : true;
-
-      const matchProj = fProj ? p === fProj : true;
-      const matchPer = fPer ? per === fPer : true;
-      const matchLoc = fLoc ? loc === fLoc : true;
-
-      return matchOrg && matchProj && matchPer && matchLoc;
+      const matchProj = project ? p === project : true;
+      const matchPer = period ? per === period : true;
+      const matchLoc = location ? loc === location : true;
+      return matchProj && matchPer && matchLoc;
     });
 
     if (!filteredDataRows.length) return [];
@@ -1411,27 +1264,18 @@
     if (!allRows.length || allRows.length <= 1) return [];
 
     const headerRow = allRows[0];
-    const headersLower = headerRow.map(h => norm(h));
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
-    const idxProject = (findHeaderIndex(headersLower, ["project", "name"]) !== -1)
-      ? findHeaderIndex(headersLower, ["project", "name"])
-      : headersLower.indexOf("project name");
-
-    const idxPeriod = (findHeaderIndex(headersLower, ["reporting", "period"]) !== -1)
-      ? findHeaderIndex(headersLower, ["reporting", "period"])
-      : headersLower.indexOf("reporting period");
-
-    const fProj = norm(project);
-    const fPer = norm(period);
+    const idxProject = headersLower.indexOf('project name');
+    const idxPeriod = headersLower.indexOf('reporting period');
 
     const filteredDataRows = allRows.slice(1).filter(row => {
-      if (row.every(c => String(c || "").trim() === "")) return false;
+      if (row.every(c => c.trim() === "")) return false;
+      const p = idxProject !== -1 ? (row[idxProject] || '').trim() : '';
+      const per = idxPeriod !== -1 ? (row[idxPeriod] || '').trim() : '';
 
-      const p = idxProject !== -1 ? norm(row[idxProject]) : '';
-      const per = idxPeriod !== -1 ? norm(row[idxPeriod]) : '';
-
-      const matchProj = fProj ? p === fProj : true;
-      const matchPer = fPer ? per === fPer : true;
+      const matchProj = project ? p === project : true;
+      const matchPer = period ? per === period : true;
       return matchProj && matchPer;
     });
 
@@ -1439,6 +1283,7 @@
     return [headerRow].concat(filteredDataRows);
   }
 
+  // ===== TABLE RENDERERS =====
   function renderMonitoringTable(rows) {
     const thead = document.getElementById('monitoring-head');
     const tbody = document.getElementById('monitoring-body');
@@ -1450,7 +1295,7 @@
     if (!rows || !rows.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 99;
+      td.colSpan = 4;
       td.textContent = "No monitoring records found for current filter selection.";
       tr.appendChild(td);
       tbody.appendChild(tr);
@@ -1465,7 +1310,7 @@
     });
     thead.appendChild(headerRow);
 
-    const headerNames = rows[0].map(h => (h || "").trim().toLowerCase());
+    const headerNames = rows[0].map(h => h.trim().toLowerCase());
     const ratingHeaders = [
       "activity implementation on schedule",
       "budget utilization as planned",
@@ -1483,7 +1328,7 @@
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => String(c || "").trim() === "")) continue;
+      if (row.every(c => c.trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
@@ -1518,7 +1363,7 @@
     if (!rows || !rows.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 99;
+      td.colSpan = 4;
       td.textContent = "No evaluation records found for current filter selection.";
       tr.appendChild(td);
       tbody.appendChild(tr);
@@ -1533,7 +1378,7 @@
     });
     thead.appendChild(headerRow);
 
-    const headerNames = rows[0].map(h => (h || "").trim().toLowerCase());
+    const headerNames = rows[0].map(h => h.trim().toLowerCase());
     let ratingIndex = -1;
     headerNames.forEach((name, idx) => {
       if (name.includes("rating") && ratingIndex === -1) ratingIndex = idx;
@@ -1541,7 +1386,7 @@
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.every(c => String(c || "").trim() === "")) continue;
+      if (row.every(c => c.trim() === "")) continue;
 
       const tr = document.createElement('tr');
 
@@ -1565,6 +1410,7 @@
     }
   }
 
+  // ===== KPI / CARD HELPERS =====
   function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
@@ -1572,7 +1418,7 @@
 
   function averageFieldFromRows(rows, headerRow, headerNameLower) {
     if (!rows.length || !headerRow.length) return 0;
-    const headers = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headers = headerRow.map(h => h.trim().toLowerCase());
     const idx = headers.indexOf(headerNameLower);
     if (idx === -1) return 0;
 
@@ -1588,11 +1434,12 @@
     return count ? sum / count : 0;
   }
 
+  // ===== OVERVIEW CARD (existing counters) =====
   function updateOverviewCard(monitorRows, evalRows) {
     if (!monitorRows || !monitorRows.length) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxProject = headersLower.indexOf('project name');
     const idxBenef   = headersLower.indexOf('number of beneficiaries reached this period.');
@@ -1605,11 +1452,11 @@
 
     for (let i = 1; i < monitorRows.length; i++) {
       const row = monitorRows[i];
-      if (row.every(c => String(c || "").trim() === "")) continue;
+      if (row.every(c => c.trim() === "")) continue;
 
       monCount++;
 
-      if (idxProject !== -1 && row[idxProject]) projectSet.add(String(row[idxProject]).trim());
+      if (idxProject !== -1 && row[idxProject]) projectSet.add(row[idxProject].trim());
 
       if (idxBenef !== -1 && row[idxBenef] !== undefined) {
         const b = parseFloat(row[idxBenef]);
@@ -1639,6 +1486,7 @@
     setText('ov-overall-score', overallScore);
   }
 
+  // ===== LEARNING CARD =====
   function updateLearningCard(monitorRows) {
     const list = document.getElementById('learning-list');
     if (!list) return;
@@ -1647,7 +1495,7 @@
     if (!monitorRows || !monitorRows.length) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxProject    = headersLower.indexOf('project name');
     const idxPeriod     = headersLower.indexOf('reporting period');
@@ -1655,7 +1503,7 @@
     const idxChallenges = headersLower.indexOf('key challenges / risks');
     const idxActions    = headersLower.indexOf('immediate actions required / recommendations');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
     const recent = dataRows.slice(-6).reverse();
 
     recent.forEach(row => {
@@ -1678,16 +1526,17 @@
     });
   }
 
+  // ===== REPORTS CARD =====
   function updateReportsCard(monitorRows) {
     if (!monitorRows || !monitorRows.length) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxPeriod = headersLower.indexOf('reporting period');
     const idxDate   = headersLower.indexOf('reporting date');
 
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
     const totalReports = dataRows.length;
 
     let latestPeriod = 'N/A';
@@ -1704,6 +1553,7 @@
     setText('rep-date', latestDate);
   }
 
+  // ===== CHARTS (Overview charts) =====
   function updateCharts(monitorRows) {
     const ctx1 = document.getElementById('chart-avg-ratings');
     const ctx2 = document.getElementById('chart-beneficiaries');
@@ -1711,7 +1561,7 @@
     if (!monitorRows || !monitorRows.length || !ctx1 || !ctx2) return;
 
     const headerRow = monitorRows[0];
-    const headersLower = headerRow.map(h => (h || "").trim().toLowerCase());
+    const headersLower = headerRow.map(h => h.trim().toLowerCase());
 
     const idxAct    = headersLower.indexOf('activity implementation on schedule');
     const idxBud    = headersLower.indexOf('budget utilization as planned');
@@ -1747,7 +1597,7 @@
     });
 
     const periodMap = new Map();
-    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+    const dataRows = monitorRows.slice(1).filter(r => !r.every(c => c.trim() === ""));
 
     dataRows.forEach(row => {
       if (idxPeriod === -1 || idxBenef === -1) return;
@@ -1779,6 +1629,9 @@
     });
   }
 
+  // ===========================
+  // Monitoring Summary Charts
+  // ===========================
   function safeLower(s) {
     return (s || "").trim().toLowerCase();
   }
@@ -1931,6 +1784,9 @@
     });
   }
 
+  // ===========================
+  // Evaluation Charts
+  // ===========================
   function updateEvaluationCharts(evalRows) {
     const canvas = document.getElementById("eval-chart-ratings");
     if (!canvas) return;
@@ -1981,6 +1837,9 @@
     });
   }
 
+  // ===========================
+  // Traffic-light KPI Engine
+  // ===========================
   function getCssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
@@ -2018,9 +1877,7 @@
     return getCssVar("--status-bad");
   }
 
-  /* ====== The rest of your code below is unchanged (KPIs, PDF, AI, etc.) ====== */
-  /* ====== You can keep everything you already had after this point. ====== */
-
+  // ----- Monitoring KPIs -----
   function updateMonitoringKPIs(monitorRows) {
     const barCanvas = document.getElementById("mon-kpi-bar");
     const donutCanvas = document.getElementById("mon-kpi-donut");
@@ -2139,9 +1996,7 @@
     });
   }
 
-  /* ====== KEEP YOUR REMAINING FUNCTIONS UNCHANGED BELOW ====== */
-  /* updateEvaluationKPIs, updateOverviewKPIs, generatePDFReport, setupDataEntryForms, sendToAIAssistant etc. */
-
+  // ----- Evaluation KPIs -----
   function updateEvaluationKPIs(evalRows) {
     const barCanvas = document.getElementById("eval-kpi-bar");
     const donutCanvas = document.getElementById("eval-kpi-donut");
@@ -2258,14 +2113,181 @@
     });
   }
 
+  // ✅ NEW: Overview KPIs (Monitoring + Evaluation + Combined)
   function updateOverviewKPIs(monitorRows, evalRows) {
-    /* your existing function unchanged */
-    /* (kept as-is in your original file) */
-    /* For brevity of changes, this remains exactly the same logic you provided. */
-    /* --- paste your original updateOverviewKPIs here if you want it reprinted verbatim --- */
-    // NOTE: Your original code continues below in your file; keep it as it was.
+    const barCanvas = document.getElementById("ov-kpi-bar");
+    const donutCanvas = document.getElementById("ov-kpi-donut");
+    if (!barCanvas || !donutCanvas) return;
+
+    // --- Monitoring overall % (from monitoring rows)
+    let monOverallPct = 0;
+    let monBad = 0, monWarn = 0, monGood = 0;
+
+    if (monitorRows && monitorRows.length > 1) {
+      const headerRow = monitorRows[0];
+      const headersLower = headerRow.map(h => safeLower(h));
+
+      const idxAct   = headersLower.indexOf("activity implementation on schedule");
+      const idxBud   = headersLower.indexOf("budget utilization as planned");
+      const idxStaff = headersLower.indexOf("staff availability");
+      const idxComm  = headersLower.indexOf("community participation");
+      const idxCoord = headersLower.indexOf("coordination with partners");
+
+      const avgAct   = idxAct   !== -1 ? averageFieldFromRows(monitorRows, headerRow, "activity implementation on schedule") : 0;
+      const avgBud   = idxBud   !== -1 ? averageFieldFromRows(monitorRows, headerRow, "budget utilization as planned") : 0;
+      const avgStaff = idxStaff !== -1 ? averageFieldFromRows(monitorRows, headerRow, "staff availability") : 0;
+      const avgComm  = idxComm  !== -1 ? averageFieldFromRows(monitorRows, headerRow, "community participation") : 0;
+      const avgCoord = idxCoord !== -1 ? averageFieldFromRows(monitorRows, headerRow, "coordination with partners") : 0;
+
+      const pcts = [
+        Math.round(percentFromRating(avgAct)),
+        Math.round(percentFromRating(avgBud)),
+        Math.round(percentFromRating(avgStaff)),
+        Math.round(percentFromRating(avgComm)),
+        Math.round(percentFromRating(avgCoord))
+      ].filter(p => p > 0);
+
+      monOverallPct = pcts.length ? Math.round(pcts.reduce((a, x) => a + x, 0) / pcts.length) : 0;
+
+      // Distribution counts (row-level)
+      const dataRows = monitorRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+      dataRows.forEach(row => {
+        const vals = [];
+        [idxAct, idxBud, idxStaff, idxComm, idxCoord].forEach(idx => {
+          if (idx !== -1) {
+            const v = parseFloat(row[idx] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+        });
+        if (!vals.length) return;
+        const rowAvg = vals.reduce((a, x) => a + x, 0) / vals.length;
+        if (rowAvg >= 4) monGood++;
+        else if (rowAvg <= 2) monBad++;
+        else monWarn++;
+      });
+    }
+
+    // --- Evaluation outcome/impact/performance % and distribution counts
+    let evOutcomePct = 0, evImpactPct = 0, evPerfPct = 0;
+    let evBad = 0, evWarn = 0, evGood = 0;
+
+    if (evalRows && evalRows.length > 1) {
+      const headerRow = evalRows[0];
+      const headersLower = headerRow.map(h => safeLower(h));
+
+      const idxOutcome = headersLower.findIndex(h => h.includes("outcome") && h.includes("rating"));
+      const idxImpact  = headersLower.findIndex(h => h.includes("impact") && h.includes("rating"));
+      let idxPerf = headersLower.findIndex(h => (h.includes("overall") || h.includes("performance")) && h.includes("rating"));
+      if (idxPerf === -1) idxPerf = headersLower.findIndex(h => h.includes("rating"));
+
+      const avgOutcome = idxOutcome !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxOutcome]) : 0;
+      const avgImpact  = idxImpact  !== -1 ? averageFieldFromRows(evalRows, headerRow, headersLower[idxImpact])  : 0;
+
+      let avgPerf = 0;
+      if (idxPerf !== -1) {
+        avgPerf = averageFieldFromRows(evalRows, headerRow, headersLower[idxPerf]);
+      } else {
+        const tmp = [avgOutcome, avgImpact].filter(x => x > 0);
+        avgPerf = tmp.length ? (tmp.reduce((a, x) => a + x, 0) / tmp.length) : 0;
+      }
+
+      evOutcomePct = Math.round(percentFromRating(avgOutcome));
+      evImpactPct  = Math.round(percentFromRating(avgImpact));
+      evPerfPct    = Math.round(percentFromRating(avgPerf));
+
+      const dataRows = evalRows.slice(1).filter(r => !r.every(c => String(c || "").trim() === ""));
+      dataRows.forEach(row => {
+        let perfVal = NaN;
+        if (idxPerf !== -1) perfVal = parseFloat(row[idxPerf] || "");
+
+        if (isNaN(perfVal)) {
+          const vals = [];
+          if (idxOutcome !== -1) {
+            const v = parseFloat(row[idxOutcome] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+          if (idxImpact !== -1) {
+            const v = parseFloat(row[idxImpact] || "");
+            if (!isNaN(v)) vals.push(v);
+          }
+          if (vals.length) perfVal = vals.reduce((a, x) => a + x, 0) / vals.length;
+        }
+
+        if (isNaN(perfVal)) return;
+
+        if (perfVal >= 4) evGood++;
+        else if (perfVal <= 2) evBad++;
+        else evWarn++;
+      });
+    }
+
+    // --- Combined Project Performance %
+    // Use average of (Monitoring Overall, Evaluation Performance) if both exist; else whichever exists.
+    const comboParts = [];
+    if (monOverallPct > 0) comboParts.push(monOverallPct);
+    if (evPerfPct > 0) comboParts.push(evPerfPct);
+    const combinedPct = comboParts.length ? Math.round(comboParts.reduce((a, x) => a + x, 0) / comboParts.length) : 0;
+
+    // Update KPI texts
+    setText("ov-kpi-monitoring", monOverallPct + "%");
+    setText("ov-kpi-evalperf", evPerfPct + "%");
+    setText("ov-kpi-outcome", evOutcomePct + "%");
+    setText("ov-kpi-impact", evImpactPct + "%");
+    setText("ov-kpi-combined", combinedPct + "%");
+
+    // Apply status styling
+    applyKpiStatus("ov-kpi-monitoring-box", "ov-kpi-monitoring", monOverallPct);
+    applyKpiStatus("ov-kpi-evalperf-box", "ov-kpi-evalperf", evPerfPct);
+    applyKpiStatus("ov-kpi-outcome-box", "ov-kpi-outcome", evOutcomePct);
+    applyKpiStatus("ov-kpi-impact-box", "ov-kpi-impact", evImpactPct);
+    applyKpiStatus("ov-kpi-combined-box", "ov-kpi-combined", combinedPct);
+
+    // Bar chart
+    const barLabels = ["Monitoring", "Evaluation", "Outcome", "Impact", "Combined"];
+    const barData = [monOverallPct, evPerfPct, evOutcomePct, evImpactPct, combinedPct];
+    const barColors = barData.map(p => chartColorForPercent(p));
+
+    if (ovKpiBarChart) ovKpiBarChart.destroy();
+    ovKpiBarChart = new Chart(barCanvas, {
+      type: "bar",
+      data: {
+        labels: barLabels,
+        datasets: [{
+          label: "High Level KPI Score (%)",
+          data: barData,
+          backgroundColor: barColors
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+
+    // Doughnut chart (combined distribution counts)
+    const totalBad = monBad + evBad;
+    const totalWarn = monWarn + evWarn;
+    const totalGood = monGood + evGood;
+
+    if (ovKpiDonutChart) ovKpiDonutChart.destroy();
+    ovKpiDonutChart = new Chart(donutCanvas, {
+      type: "doughnut",
+      data: {
+        labels: ["Off-track / Poor", "Moderate / Watch", "On-track / Good"],
+        datasets: [{
+          data: [totalBad, totalWarn, totalGood],
+          backgroundColor: [
+            getCssVar("--status-bad"),
+            getCssVar("--status-warn"),
+            getCssVar("--status-good")
+          ]
+        }]
+      },
+      options: { responsive: true }
+    });
   }
 
+  // ===== PDF REPORT =====
   function generatePDFReport() {
     try {
       const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
@@ -2299,6 +2321,7 @@
     }
   }
 
+  // ===== DATA ENTRY FORMS (DEMO HOOKS) =====
   function setupDataEntryForms() {
     const monForm = document.getElementById('monitoring-entry-form');
     const evalForm = document.getElementById('evaluation-entry-form');
@@ -2318,6 +2341,7 @@
     }
   }
 
+  // ===== AI ASSISTANT (FRONTEND HOOK) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
     const promptEl = document.getElementById('ai-prompt');
@@ -2331,7 +2355,6 @@
 
     if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
 
-    const organization = document.getElementById('filter-organization')?.value || '';
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
@@ -2348,7 +2371,7 @@
       mode,
       user_prompt: prompt,
       include_filters: includeFilters,
-      filters: { organization, project, period, location },
+      filters: { project, period, location },
       kpi_snapshot: kpis
     };
 
@@ -2380,3 +2403,4 @@
 
 </body>
 </html>
+

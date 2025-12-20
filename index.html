@@ -900,7 +900,7 @@
             <label for="ai-include-filters">Include current filters & KPI summary in analysis</label>
           </div>
 
-          <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI (Demo)</button>
+          <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI</button>
           <div id="ai-status" class="info-note"></div>
         </div>
 
@@ -926,9 +926,9 @@
 
 <script>
   // ===========================
-  // CONFIG: BACKEND AI ENDPOINT (DEMO)
+  // CONFIG: LOCAL BACKEND AI ENDPOINT
   // ===========================
-  const AI_API_URL = "https://YOUR-RAILWAY-APP.up.railway.app/api/pas-ai-chat";
+  const AI_API_URL = "http://localhost:5000/api/pas-ai-chat";
 
   let monitoringRows = [];
   let evaluationRows = [];
@@ -2222,7 +2222,6 @@
     }
 
     // --- Combined Project Performance %
-    // Use average of (Monitoring Overall, Evaluation Performance) if both exist; else whichever exists.
     const comboParts = [];
     if (monOverallPct > 0) comboParts.push(monOverallPct);
     if (evPerfPct > 0) comboParts.push(evPerfPct);
@@ -2341,7 +2340,7 @@
     }
   }
 
-  // ===== AI ASSISTANT (FRONTEND HOOK) =====
+  // ===== AI ASSISTANT (FRONTEND HOOK, WIRED TO LOCAL BACKEND) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
     const promptEl = document.getElementById('ai-prompt');
@@ -2353,7 +2352,10 @@
     const prompt = (promptEl ? promptEl.value : '').trim();
     const includeFilters = includeFiltersEl ? includeFiltersEl.checked : true;
 
-    if (!prompt) { alert('Please enter a prompt or question for the AI assistant.'); return; }
+    if (!prompt) {
+      alert('Please enter a prompt or question for the AI assistant.');
+      return;
+    }
 
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
@@ -2367,15 +2369,15 @@
       overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
     };
 
+    // Payload shaped to match backend { message, filters }
     const payload = {
-      mode,
-      user_prompt: prompt,
-      include_filters: includeFilters,
-      filters: { project, period, location },
-      kpi_snapshot: kpis
+      message: `[Mode: ${mode}] ${prompt}`,
+      filters: includeFilters
+        ? { project, period, location, kpi_snapshot: kpis }
+        : {}
     };
 
-    statusEl.textContent = 'Sending request to demo AI endpoint (httpbin.org)...';
+    statusEl.textContent = 'Contacting ProMEL AI backend...';
     responseBox.textContent = '';
 
     try {
@@ -2388,11 +2390,14 @@
       if (!res.ok) throw new Error('HTTP ' + res.status + ' from AI backend');
 
       const data = await res.json();
-      const echoed = data.json || data;
-      responseBox.textContent =
-        'Demo response from httpbin.org (this is just echoing what you sent):\n\n' +
-        JSON.stringify(echoed, null, 2);
-      statusEl.textContent = 'Demo AI response received.';
+
+      if (data.success) {
+        responseBox.textContent = data.reply || '(No reply text returned)';
+        statusEl.textContent = 'AI response received.';
+      } else {
+        responseBox.textContent = '';
+        statusEl.textContent = 'AI error: ' + (data.error || 'Unknown error from backend');
+      }
     } catch (err) {
       console.error(err);
       statusEl.textContent = 'Error contacting AI backend: ' + err.message;
@@ -2403,5 +2408,3 @@
 
 </body>
 </html>
-
-

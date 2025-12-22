@@ -2348,6 +2348,9 @@
     const statusEl = document.getElementById('ai-status');
     const responseBox = document.getElementById('ai-response-box');
 
+    // The button inside the AI input panel (the one that calls this function)
+    const buttonEl = document.querySelector('#openai .ai-input-panel button');
+
     const mode = modeEl ? modeEl.value : 'custom';
     const prompt = (promptEl ? promptEl.value : '').trim();
     const includeFilters = includeFiltersEl ? includeFiltersEl.checked : true;
@@ -2357,10 +2360,12 @@
       return;
     }
 
+    // Current filter context
     const project = document.getElementById('filter-project')?.value || '';
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
 
+    // Overview KPIs snapshot
     const kpis = {
       totalProjects: document.getElementById('ov-total-projects')?.textContent || '0',
       totalMonitoring: document.getElementById('ov-total-monitoring')?.textContent || '0',
@@ -2377,8 +2382,13 @@
         : {}
     };
 
-    statusEl.textContent = 'Contacting ProMEL AI backend...';
-    responseBox.textContent = '';
+    // UI: show loading state
+    if (statusEl) statusEl.textContent = 'ProMEL AI is analysing your request…';
+    if (responseBox) responseBox.textContent = '';
+    if (buttonEl) {
+      buttonEl.disabled = true;
+      buttonEl.textContent = 'Thinking…';
+    }
 
     try {
       const res = await fetch(AI_API_URL, {
@@ -2387,21 +2397,37 @@
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error('HTTP ' + res.status + ' from AI backend');
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        throw new Error('Could not read AI response (invalid JSON).');
+      }
 
-      const data = await res.json();
+      if (!res.ok) {
+        const apiError = data?.error || `HTTP ${res.status}`;
+        if (statusEl) statusEl.textContent = 'Error from ProMEL AI backend.';
+        if (responseBox) responseBox.textContent = apiError;
+        return;
+      }
 
       if (data.success) {
-        responseBox.textContent = data.reply || '(No reply text returned)';
-        statusEl.textContent = 'AI response received.';
+        if (responseBox) responseBox.textContent = data.reply || '(No reply text returned)';
+        if (statusEl) statusEl.textContent = 'AI response received.';
       } else {
-        responseBox.textContent = '';
-        statusEl.textContent = 'AI error: ' + (data.error || 'Unknown error from backend');
+        if (statusEl) statusEl.textContent = 'AI error: ' + (data.error || 'Unknown error from backend');
+        if (responseBox) responseBox.textContent = '';
       }
     } catch (err) {
-      console.error(err);
-      statusEl.textContent = 'Error contacting AI backend: ' + err.message;
-      responseBox.textContent = '';
+      console.error('Error calling ProMEL AI endpoint:', err);
+      if (statusEl) statusEl.textContent = 'Network or backend error. Please try again.';
+      if (responseBox) responseBox.textContent = err.message || String(err);
+    } finally {
+      // Reset button state
+      if (buttonEl) {
+        buttonEl.disabled = false;
+        buttonEl.textContent = 'Ask ProMEL AI';
+      }
     }
   }
 </script>

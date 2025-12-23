@@ -954,6 +954,37 @@
   let ovKpiBarChart = null;
   let ovKpiDonutChart = null;
 
+  // ==========================================================
+  // ✅ NEW (Step 1): Snapshot builder so AI can "see" sheet data
+  // ==========================================================
+  function rowsToObjects(rows) {
+    if (!rows || rows.length < 2) return [];
+    const headers = rows[0].map(h => (h || "").trim());
+    return rows.slice(1)
+      .filter(r => !r.every(c => String(c || "").trim() === ""))
+      .map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+        return obj;
+      });
+  }
+
+  function buildAISnapshot(limit = 40) {
+    // Prefer filtered rows if filters are active; otherwise use full dataset
+    const monRows = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+    const evRows  = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
+
+    const monObjs = rowsToObjects(monRows).slice(-limit);
+    const evObjs  = rowsToObjects(evRows).slice(-limit);
+
+    return {
+      monitoring_sample: monObjs,
+      evaluation_sample: evObjs,
+      monitoring_count: monObjs.length,
+      evaluation_count: evObjs.length
+    };
+  }
+
   // ===========================
   // LOGIN & INIT
   // ===========================
@@ -2374,12 +2405,18 @@
       overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
     };
 
-    // Payload shaped to match backend { message, filters }
+    // ==========================================================
+    // ✅ NEW (Step 2): Attach LIVE sheet snapshot to backend payload
+    // ==========================================================
+    const snapshot = includeFilters ? buildAISnapshot(40) : null;
+
+    // Payload shaped to match backend { message, filters, data_snapshot }
     const payload = {
       message: `[Mode: ${mode}] ${prompt}`,
       filters: includeFilters
         ? { project, period, location, kpi_snapshot: kpis }
-        : {}
+        : {},
+      data_snapshot: snapshot
     };
 
     // UI: show loading state

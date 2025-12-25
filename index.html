@@ -943,9 +943,10 @@
 
 <script>
   // ===========================
-  // CONFIG: LOCAL BACKEND AI ENDPOINT
+  // CONFIG: AI BACKEND ENDPOINT (ONLINE - RAILWAY)
   // ===========================
-  const AI_API_URL = "http://localhost:5000/api/pas-ai-chat";
+  // ✅ IMPORTANT: use the full endpoint path (not localhost)
+  const AI_API_URL = "https://promel-ai-backend-production.up.railway.app/api/pas-ai-chat";
 
   let monitoringRows = [];
   let evaluationRows = [];
@@ -2462,7 +2463,7 @@
     });
   }
 
-  // ===== AI ASSISTANT (FRONTEND HOOK, WIRED TO LOCAL BACKEND) =====
+  // ===== AI ASSISTANT (FRONTEND HOOK, WIRED TO RAILWAY BACKEND) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
     const promptEl = document.getElementById('ai-prompt');
@@ -2487,21 +2488,21 @@
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
 
-    // ✅ NEW (C-1): Build record samples so AI can read narrative fields
+    // Build record samples so AI can read narrative fields
     const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
     const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
 
     const monitoringObjects = rowsToObjects(monitorForView);
     const evaluationObjects = rowsToObjects(evalForView);
 
-    // Take last 8 records (adjust as needed)
+    // Take last 8 records
     const monitoring_sample = takeLastN(monitoringObjects, 8);
     const evaluation_sample = takeLastN(evaluationObjects, 8);
 
     // KPI snapshot
     const kpi_snapshot = buildKpiSnapshot();
 
-    // ✅ NEW (C-2): Ask backend to return strict JSON (for visuals)
+    // Ask backend to return strict JSON (for visuals)
     const aiInstruction = `
 Return your answer as STRICT JSON (no markdown) with this schema:
 
@@ -2568,7 +2569,7 @@ And distribution counts:
         return;
       }
 
-      // ✅ NEW (C-3): Parse JSON reply and render visuals; fallback to text mode
+      // Parse JSON reply and render visuals; fallback to text mode
       if (data.success) {
         const rawReply = data.reply || '';
         const parsed = tryParseJson(rawReply);

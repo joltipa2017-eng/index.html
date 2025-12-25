@@ -904,9 +904,26 @@
           <div id="ai-status" class="info-note"></div>
         </div>
 
+        <!-- ✅ UPDATED (A): Output panel now includes AI visuals canvases -->
         <div class="ai-output-panel">
           <h3>AI Response</h3>
           <div id="ai-response-box"></div>
+
+          <!-- ✅ NEW: AI VISUALS (auto-rendered if backend returns chart JSON) -->
+          <div style="margin-top:10px;">
+            <div class="table-wrapper" style="margin:0; padding:8px;">
+              <strong style="font-size:0.8rem;">AI Visual 1: Key KPI Scores (Traffic-light)</strong>
+              <canvas id="ai-vis-kpi-bar"></canvas>
+              <div class="info-note" style="margin-top:6px;">
+                Red = Off-track, Yellow = Watch, Green = On-track.
+              </div>
+            </div>
+
+            <div class="table-wrapper" style="margin-top:10px; padding:8px;">
+              <strong style="font-size:0.8rem;">AI Visual 2: Record Distribution (Good/Watch/Poor)</strong>
+              <canvas id="ai-vis-distribution-donut"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -953,37 +970,6 @@
   // ✅ NEW: Overview traffic-light charts
   let ovKpiBarChart = null;
   let ovKpiDonutChart = null;
-
-  // ==========================================================
-  // ✅ NEW (Step 1): Snapshot builder so AI can "see" sheet data
-  // ==========================================================
-  function rowsToObjects(rows) {
-    if (!rows || rows.length < 2) return [];
-    const headers = rows[0].map(h => (h || "").trim());
-    return rows.slice(1)
-      .filter(r => !r.every(c => String(c || "").trim() === ""))
-      .map(r => {
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
-        return obj;
-      });
-  }
-
-  function buildAISnapshot(limit = 40) {
-    // Prefer filtered rows if filters are active; otherwise use full dataset
-    const monRows = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
-    const evRows  = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
-
-    const monObjs = rowsToObjects(monRows).slice(-limit);
-    const evObjs  = rowsToObjects(evRows).slice(-limit);
-
-    return {
-      monitoring_sample: monObjs,
-      evaluation_sample: evObjs,
-      monitoring_count: monObjs.length,
-      evaluation_count: evObjs.length
-    };
-  }
 
   // ===========================
   // LOGIN & INIT
@@ -2371,6 +2357,111 @@
     }
   }
 
+  // ===========================
+  // ✅ NEW (B): AI Snapshot + Row Sampling + Visual Renderer
+  // ===========================
+  let aiKpiBarChart = null;
+  let aiDistDonutChart = null;
+
+  function safeNum(v) {
+    const n = parseFloat(v);
+    return isNaN(n) ? null : n;
+  }
+
+  function rowsToObjects(rows) {
+    if (!rows || rows.length <= 1) return [];
+    const headers = rows[0].map(h => String(h || '').trim());
+    const objs = [];
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || r.every(c => String(c || '').trim() === '')) continue;
+      const obj = {};
+      headers.forEach((h, idx) => obj[h] = (r[idx] ?? '').toString().trim());
+      objs.push(obj);
+    }
+    return objs;
+  }
+
+  function takeLastN(objs, n) {
+    if (!Array.isArray(objs)) return [];
+    if (objs.length <= n) return objs;
+    return objs.slice(objs.length - n);
+  }
+
+  function buildKpiSnapshot() {
+    return {
+      totalProjects: document.getElementById('ov-total-projects')?.textContent || '0',
+      totalMonitoring: document.getElementById('ov-total-monitoring')?.textContent || '0',
+      totalEvaluation: document.getElementById('ov-total-evaluation')?.textContent || '0',
+      totalBeneficiaries: document.getElementById('ov-total-beneficiaries')?.textContent || '0',
+      overallScore: document.getElementById('ov-overall-score')?.textContent || '0',
+
+      monitoringOverallPct: document.getElementById('ov-kpi-monitoring')?.textContent || '0%',
+      evaluationPerfPct: document.getElementById('ov-kpi-evalperf')?.textContent || '0%',
+      outcomePct: document.getElementById('ov-kpi-outcome')?.textContent || '0%',
+      impactPct: document.getElementById('ov-kpi-impact')?.textContent || '0%',
+      combinedPct: document.getElementById('ov-kpi-combined')?.textContent || '0%'
+    };
+  }
+
+  function tryParseJson(text) {
+    if (!text) return null;
+    const t = String(text).trim();
+    const unfenced = t
+      .replace(/^```json/i, '')
+      .replace(/^```/i, '')
+      .replace(/```$/i, '')
+      .trim();
+    try { return JSON.parse(unfenced); } catch { return null; }
+  }
+
+  function renderAiVisuals(visuals) {
+    const barCanvas = document.getElementById('ai-vis-kpi-bar');
+    const donutCanvas = document.getElementById('ai-vis-distribution-donut');
+    if (!barCanvas || !donutCanvas) return;
+
+    const kpiScores = visuals?.kpi_scores || [];
+    const dist = visuals?.distribution || { good: 0, watch: 0, poor: 0 };
+
+    const labels = kpiScores.map(x => x.label || 'KPI');
+    const data = kpiScores.map(x => Math.max(0, Math.min(100, safeNum(x.percent) ?? 0)));
+    const colors = data.map(p => chartColorForPercent(p));
+
+    if (aiKpiBarChart) aiKpiBarChart.destroy();
+    aiKpiBarChart = new Chart(barCanvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'KPI Score (%)',
+          data,
+          backgroundColor: colors
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+
+    if (aiDistDonutChart) aiDistDonutChart.destroy();
+    aiDistDonutChart = new Chart(donutCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['On-track / Good', 'Moderate / Watch', 'Off-track / Poor'],
+        datasets: [{
+          data: [dist.good || 0, dist.watch || 0, dist.poor || 0],
+          backgroundColor: [
+            getCssVar('--status-good'),
+            getCssVar('--status-warn'),
+            getCssVar('--status-bad')
+          ]
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+
   // ===== AI ASSISTANT (FRONTEND HOOK, WIRED TO LOCAL BACKEND) =====
   async function sendToAIAssistant() {
     const modeEl = document.getElementById('ai-mode');
@@ -2396,27 +2487,56 @@
     const period = document.getElementById('filter-period')?.value || '';
     const location = document.getElementById('filter-location')?.value || '';
 
-    // Overview KPIs snapshot
-    const kpis = {
-      totalProjects: document.getElementById('ov-total-projects')?.textContent || '0',
-      totalMonitoring: document.getElementById('ov-total-monitoring')?.textContent || '0',
-      totalEvaluation: document.getElementById('ov-total-evaluation')?.textContent || '0',
-      totalBeneficiaries: document.getElementById('ov-total-beneficiaries')?.textContent || '0',
-      overallScore: document.getElementById('ov-overall-score')?.textContent || '0'
-    };
+    // ✅ NEW (C-1): Build record samples so AI can read narrative fields
+    const monitorForView = monitoringFilteredRows.length ? monitoringFilteredRows : monitoringRows;
+    const evalForView = evaluationFilteredRows.length ? evaluationFilteredRows : evaluationRows;
 
-    // ==========================================================
-    // ✅ NEW (Step 2): Attach LIVE sheet snapshot to backend payload
-    // ==========================================================
-    const snapshot = includeFilters ? buildAISnapshot(40) : null;
+    const monitoringObjects = rowsToObjects(monitorForView);
+    const evaluationObjects = rowsToObjects(evalForView);
 
-    // Payload shaped to match backend { message, filters, data_snapshot }
+    // Take last 8 records (adjust as needed)
+    const monitoring_sample = takeLastN(monitoringObjects, 8);
+    const evaluation_sample = takeLastN(evaluationObjects, 8);
+
+    // KPI snapshot
+    const kpi_snapshot = buildKpiSnapshot();
+
+    // ✅ NEW (C-2): Ask backend to return strict JSON (for visuals)
+    const aiInstruction = `
+Return your answer as STRICT JSON (no markdown) with this schema:
+
+{
+  "report_title": "string",
+  "report_markdown": "string (use headings, bullet points, short paragraphs)",
+  "key_findings": ["string", "..."],
+  "recommendations": ["string", "..."],
+  "visuals": {
+    "kpi_scores": [{"label":"string","percent":number}, ...],
+    "distribution": {"good":number,"watch":number,"poor":number}
+  }
+}
+
+Use monitoring_sample and evaluation_sample narrative fields:
+- Main achievements this period.
+- Key challenges / risks.
+- Immediate actions required / recommendations.
+- Reporting date and reporting period.
+
+Also compute the KPI scores (%):
+- Activity, Budget, Staff, Community, Coordination (from monitoring ratings 1–5 scaled to %)
+- Outcome, Impact, Performance (from evaluation ratings 1–5 scaled to %)
+And distribution counts:
+- good = avg rating >= 4
+- watch = avg rating == 3
+- poor = avg rating <= 2
+`.trim();
+
     const payload = {
-      message: `[Mode: ${mode}] ${prompt}`,
-      filters: includeFilters
-        ? { project, period, location, kpi_snapshot: kpis }
-        : {},
-      data_snapshot: snapshot
+      message: `[Mode: ${mode}] ${prompt}\n\n${aiInstruction}`,
+      filters: includeFilters ? { project, period, location } : {},
+      kpi_snapshot: includeFilters ? kpi_snapshot : {},
+      monitoring_sample: includeFilters ? monitoring_sample : [],
+      evaluation_sample: includeFilters ? evaluation_sample : []
     };
 
     // UI: show loading state
@@ -2448,9 +2568,33 @@
         return;
       }
 
+      // ✅ NEW (C-3): Parse JSON reply and render visuals; fallback to text mode
       if (data.success) {
-        if (responseBox) responseBox.textContent = data.reply || '(No reply text returned)';
-        if (statusEl) statusEl.textContent = 'AI response received.';
+        const rawReply = data.reply || '';
+        const parsed = tryParseJson(rawReply);
+
+        if (parsed) {
+          const title = parsed.report_title ? `# ${parsed.report_title}\n\n` : '';
+          const findings = Array.isArray(parsed.key_findings) && parsed.key_findings.length
+            ? `## Key Findings\n- ${parsed.key_findings.join('\n- ')}\n\n`
+            : '';
+          const recs = Array.isArray(parsed.recommendations) && parsed.recommendations.length
+            ? `## Recommendations\n- ${parsed.recommendations.join('\n- ')}\n\n`
+            : '';
+
+          const narrative = (title + (parsed.report_markdown || '') + '\n\n' + findings + recs).trim();
+
+          if (responseBox) responseBox.textContent = narrative || '(No narrative returned)';
+
+          // Render visuals
+          renderAiVisuals(parsed.visuals);
+
+          if (statusEl) statusEl.textContent = 'AI report + visuals generated.';
+        } else {
+          // Fallback: show raw text if backend didn't return JSON
+          if (responseBox) responseBox.textContent = rawReply || '(No reply text returned)';
+          if (statusEl) statusEl.textContent = 'AI response received (text mode).';
+        }
       } else {
         if (statusEl) statusEl.textContent = 'AI error: ' + (data.error || 'Unknown error from backend');
         if (responseBox) responseBox.textContent = '';

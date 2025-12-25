@@ -901,8 +901,13 @@
           </div>
 
           <button type="button" onclick="sendToAIAssistant()">Ask ProMEL AI</button>
-          <div id="ai-status" class="info-note"></div>
-        </div>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+  <button type="button" onclick="exportAIReportToPDF()">Download AI Report (PDF)</button>
+  <button type="button" onclick="exportAIReportToWord()">Download AI Report (Word)</button>
+</div>
+
+<div id="ai-status" class="info-note"></div>
 
         <!-- ✅ UPDATED (A): Output panel now includes AI visuals canvases -->
         <div class="ai-output-panel">
@@ -2616,3 +2621,4 @@ And distribution counts:
 
 </body>
 </html>
+
